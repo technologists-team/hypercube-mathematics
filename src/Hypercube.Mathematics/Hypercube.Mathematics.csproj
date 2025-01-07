@@ -7,7 +7,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 
-        <PackageIcon>../../assets/logo.png</PackageIcon>
+        <PackageIcon>assets/logo.png</PackageIcon>
         
         <Version>1.0.2</Version>
         <Authors>TornadoTech</Authors>
@@ -18,7 +18,7 @@
     
     <ItemGroup>
         <None Include="../../LICENSE" Pack="true" PackagePath="" Visible="false"/>
-        <None Include="../../assets/logo.png" Pack="true" PackagePath="assets/" />
+        <None Include="../../assets/logo.png" Pack="true" PackagePath="assets/" Visible="false" />
     </ItemGroup>
     
     <ItemGroup>
