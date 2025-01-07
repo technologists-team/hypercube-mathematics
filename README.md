@@ -1,5 +1,5 @@
 <div align="center">
-  <img alt="Hypercube" width="100%" height="16%" src="assets/card.svg"/>
+  <img alt="Hypercube" width="100%" height="10%" src="assets/card.svg"/>
 </div>
 
 [![C#](https://img.shields.io/badge/c%23-%23239120.svg?style=for-the-badge&logo=c-sharp&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/csharp/)
