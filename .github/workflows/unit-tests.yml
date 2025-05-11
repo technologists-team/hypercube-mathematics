@@ -1,0 +1,44 @@
+name: Unit-tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [ opened, reopened, synchronize, ready_for_review ]
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    name: Windows Build
+    runs-on: windows-latest
+
+    steps:
+    - name: ⤵️ Checkout Source
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: ⚙️ Setup Submodules
+      run: git submodule update --init --recursive
+
+    - name: ⚙️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: 📦 Install dotnet dependencies
+      run: dotnet restore
+      working-directory: src
+
+    - name: 📦 Install dotnet tools
+      run: dotnet tool restore
+      working-directory: src
+
+    - name: 🛠️ Build and Test (Debug)
+      run: dotnet test --configuration=Debug Hypercube.UnitTests/Hypercube.UnitTests.csproj
+      working-directory: src
