@@ -1,34 +1,31 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
 namespace Hypercube.Mathematics.Matrices;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public partial struct Matrix4x4
+public readonly partial struct Matrix4x4
 {
     /*
      * System.Numerics Compatibility
      */
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator System.Numerics.Matrix4x4(Matrix4x4 matrix4X4)
+    
+    public static implicit operator System.Numerics.Matrix4x4(Matrix4x4 matrix)
     {
         return new System.Numerics.Matrix4x4(
-            matrix4X4.M00, matrix4X4.M01, matrix4X4.M02, matrix4X4.M03,
-            matrix4X4.M10, matrix4X4.M11, matrix4X4.M12, matrix4X4.M13,
-            matrix4X4.M20, matrix4X4.M21, matrix4X4.M22, matrix4X4.M23,
-            matrix4X4.M30, matrix4X4.M31, matrix4X4.M32, matrix4X4.M33
+            matrix.M00, matrix.M01, matrix.M02, matrix.M03,
+            matrix.M10, matrix.M11, matrix.M12, matrix.M13,
+            matrix.M20, matrix.M21, matrix.M22, matrix.M23,
+            matrix.M30, matrix.M31, matrix.M32, matrix.M33
         );
     }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Matrix4x4(System.Numerics.Matrix4x4 matrix4X4)
+    public static implicit operator Matrix4x4(System.Numerics.Matrix4x4 matrix)
     {
         return new Matrix4x4(
-            matrix4X4.M11, matrix4X4.M12, matrix4X4.M13, matrix4X4.M14,
-            matrix4X4.M21, matrix4X4.M22, matrix4X4.M23, matrix4X4.M24,
-            matrix4X4.M31, matrix4X4.M32, matrix4X4.M33, matrix4X4.M34,
-            matrix4X4.M41, matrix4X4.M42, matrix4X4.M43, matrix4X4.M44
+            matrix.M11, matrix.M12, matrix.M13, matrix.M14,
+            matrix.M21, matrix.M22, matrix.M23, matrix.M24,
+            matrix.M31, matrix.M32, matrix.M33, matrix.M34,
+            matrix.M41, matrix.M42, matrix.M43, matrix.M44
         );
     }
 }

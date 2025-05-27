@@ -11,22 +11,22 @@ public partial struct Matrix3x2
      */
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator System.Numerics.Matrix3x2(Matrix3x2 matrix4X4)
+    public static implicit operator System.Numerics.Matrix3x2(Matrix3x2 matrix)
     {
         return new System.Numerics.Matrix3x2(
-            matrix4X4.M00, matrix4X4.M01,
-            matrix4X4.M10, matrix4X4.M11,
-            matrix4X4.M20, matrix4X4.M21
+            matrix.M00, matrix.M01,
+            matrix.M10, matrix.M11,
+            matrix.M20, matrix.M21
         );
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Matrix3x2(System.Numerics.Matrix3x2 matrix4X4)
+    public static implicit operator Matrix3x2(System.Numerics.Matrix3x2 matrix)
     {
         return new Matrix3x2(
-            matrix4X4.M11, matrix4X4.M12,
-            matrix4X4.M21, matrix4X4.M22,
-            matrix4X4.M31, matrix4X4.M32
+            matrix.M11, matrix.M12,
+            matrix.M21, matrix.M22,
+            matrix.M31, matrix.M32
         );
     }
 }

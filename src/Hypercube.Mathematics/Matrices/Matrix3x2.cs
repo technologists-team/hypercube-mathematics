@@ -96,6 +96,34 @@ public partial struct Matrix3x2
     }
 
     /// <summary>
+    /// Creating translation matrix
+    /// <code>
+    ///  1  |  0
+    ///  0  |  1
+    ///  x  |  y 
+    /// </code>
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x2 CreateTranslation(Vector2 translation)
+    {
+        return CreateTranslation(translation.X, translation.Y);
+    }
+
+    /// <summary>
+    /// Creating translation matrix
+    /// <code>
+    ///  1  |  0
+    ///  0  |  1
+    ///  x  |  y 
+    /// </code>
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x2 CreateTranslation(float x, float y)
+    {
+        return new Matrix3x2(1, 0, 0, 1, x, y);
+    }
+
+    /// <summary>
     /// Creating rotation matrix
     /// <code>
     /// cos | -sin
@@ -120,17 +148,17 @@ public partial struct Matrix3x2
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x2 CreateRotation(double angle)
     {
-        var cos = (float)Math.Cos(angle);
-        var sin = (float)Math.Sin(angle);
+        var cos = (float) Math.Cos(angle);
+        var sin = (float) Math.Sin(angle);
         return new Matrix3x2(cos, sin, -sin, cos, 0, 0);
     }
     
     /// <summary>
     /// Creating scale matrix
     /// <code>
-    ///  x  |   0
-    ///  0  |   y
-    ///  0  |   0 
+    ///  x  |  0
+    ///  0  |  y
+    ///  0  |  0 
     /// </code>
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -142,14 +170,23 @@ public partial struct Matrix3x2
     /// <summary>
     /// Creating scale matrix
     /// <code>
-    ///  x  |   0
-    ///  0  |   y
-    ///  0  |   0 
+    ///  x  |  0
+    ///  0  |  y
+    ///  0  |  0 
     /// </code>
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x2 CreateScale(float x, float y)
     {
         return new Matrix3x2(x, 0, y, 0, 0, 0);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Transform(Vector2 v)
+    {
+        return new Vector2(
+            v.X * M00 + v.Y * M10 + M20,
+            v.X * M01 + v.Y * M11 + M21
+        );
     }
 }
