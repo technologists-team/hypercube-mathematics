@@ -365,9 +365,19 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
 
     public Vector2 Transform(Vector2 vector)
     {
-        var x = M00 * vector.X + M01 * vector.Y + M03;
-        var y = M10 * vector.X + M11 * vector.Y + M13;
-        return new Vector2(x, y);
+        return new Vector2(
+            M00 * vector.X + M10 * vector.Y + M30,
+            M01 * vector.X + M11 * vector.Y + M31
+        );
+    }
+    
+    public Vector3 Transform(Vector3 vector)
+    {
+        return new Vector3(
+            M00 * vector.X + M10 * vector.Y + M20 * vector.Z + M30,
+            M01 * vector.X + M11 * vector.Y + M21 * vector.Z + M31,
+            M02 * vector.X + M12 * vector.Y + M22 * vector.Z + M32 
+        );
     }
 
     public Box2 Transform(Box2 box)
