@@ -26,28 +26,6 @@ public readonly struct Rect4 : IEquatable<Rect4>
     }
 
     /// <summary>
-    /// Creates rectangle from min and max points (axis-aligned).
-    /// </summary>
-    public static Rect4 FromMinMax(Vector2 min, Vector2 max)
-    {
-        return new Rect4(
-            new Vector2(min.X, min.Y),
-            new Vector2(max.X, min.Y),
-            new Vector2(max.X, max.Y),
-            new Vector2(min.X, max.Y)
-        );
-    }
-
-    /// <summary>
-    /// Creates rectangle from center and size.
-    /// </summary>
-    public static Rect4 FromCenterSize(Vector2 center, Vector2 size)
-    {
-        var halfSize = size / 2;
-        return FromMinMax(center - halfSize, center + halfSize);
-    }
-
-    /// <summary>
     /// Gets the bounding box that contains all four points.
     /// </summary>
     public Rect2 GetBoundingBox()
@@ -58,7 +36,7 @@ public readonly struct Rect4 : IEquatable<Rect4>
         var maxY = Math.Max(Math.Max(Point0.Y, Point1.Y), Math.Max(Point2.Y, Point3.Y));
         return new Rect2(minX, minY, maxX, maxY);
     }
-    
+
     /// <summary>
     /// Gets rectangle area (works correctly for convex quadrilaterals)
     /// </summary>
@@ -119,6 +97,28 @@ public readonly struct Rect4 : IEquatable<Rect4>
     private static float Cross(Vector2 a, Vector2 b, Vector2 p)
     {
         return (b.X - a.X) * (p.Y - a.Y) - (b.Y - a.Y) * (p.X - a.X);
+    }
+
+    /// <summary>
+    /// Creates rectangle from min and max points (axis-aligned).
+    /// </summary>
+    public static Rect4 FromMinMax(Vector2 min, Vector2 max)
+    {
+        return new Rect4(
+            new Vector2(min.X, min.Y),
+            new Vector2(max.X, min.Y),
+            new Vector2(max.X, max.Y),
+            new Vector2(min.X, max.Y)
+        );
+    }
+
+    /// <summary>
+    /// Creates rectangle from center and size.
+    /// </summary>
+    public static Rect4 FromCenterSize(Vector2 center, Vector2 size)
+    {
+        var halfSize = size / 2;
+        return FromMinMax(center - halfSize, center + halfSize);
     }
 
     public static bool operator ==(Rect4 left, Rect4 right)
