@@ -565,7 +565,7 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     
     public static Matrix4x4 CreateTransform(Vector3 position, Quaternion quaternion, Vector3 scale)
     {
-        return CreateTranslation(position) * CreateRotation(quaternion) * CreateScale(scale);
+        return CreateScale(scale) * CreateRotation(quaternion) * CreateTranslation(position);
     }
 
     /// <summary>
