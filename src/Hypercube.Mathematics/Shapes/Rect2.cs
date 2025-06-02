@@ -6,12 +6,12 @@ using JetBrains.Annotations;
 namespace Hypercube.Mathematics.Shapes;
 
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
-public readonly struct Box2
+public readonly struct Rect2
 {
-    public static readonly Box2 NaN = new(Vector2.NaN, Vector2.NaN);
-    public static readonly Box2 Zero = new(Vector2.Zero, Vector2.Zero);
-    public static readonly Box2 UV = new(0.0f, 1.0f, 1.0f, 0.0f);
-    public static readonly Box2 Centered = new(-0.5f, -0.5f, 0.5f, 0.5f);
+    public static readonly Rect2 NaN = new(Vector2.NaN, Vector2.NaN);
+    public static readonly Rect2 Zero = new(Vector2.Zero, Vector2.Zero);
+    public static readonly Rect2 UV = new(0.0f, 1.0f, 1.0f, 0.0f);
+    public static readonly Rect2 Centered = new(-0.5f, -0.5f, 0.5f, 0.5f);
     
     public float Left => Point0.X;
     public float Top => Point0.Y;
@@ -58,33 +58,33 @@ public readonly struct Box2
         ];
     }
     
-    public Box2(Vector2 point0, Vector2 point1)
+    public Rect2(Vector2 point0, Vector2 point1)
     {
         Point0 = point0;
         Point1 = point1;
     }
 
-    public Box2(float left, float top, float right, float bottom)
+    public Rect2(float left, float top, float right, float bottom)
     {
         Point0 = new Vector2(left, top);
         Point1 = new Vector2(right, bottom);
     }
 
-    public Box2(float value)
+    public Rect2(float value)
     {
         Point0 = new Vector2(value);
         Point1 = new Vector2(value);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Box2 operator +(Box2 a, Box2 b)
+    public static Rect2 operator +(Rect2 a, Rect2 b)
     {
-        return new Box2(a.Point0 + b.Point0, a.Point1 + b.Point1);
+        return new Rect2(a.Point0 + b.Point0, a.Point1 + b.Point1);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Box2 operator +(Box2 a, Vector2 b)
+    public static Rect2 operator +(Rect2 a, Vector2 b)
     {
-        return new Box2(a.Point0 + b.X, a.Point1 + b.Y);
+        return new Rect2(a.Point0 + b.X, a.Point1 + b.Y);
     }
 }

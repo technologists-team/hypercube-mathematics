@@ -380,11 +380,11 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         );
     }
 
-    public Box2 Transform(Box2 box)
+    public Rect2 Transform(Rect2 box)
     {
         var v1 = Transform(box.TopRight);
         var v2 = Transform(box.BottomLeft);
-        return new Box2(v2.X, v1.Y, v1.X, v2.Y);
+        return new Rect2(v2.X, v1.Y, v1.X, v2.Y);
     }
     
     public Matrix4x4 Transpose(Matrix4x4 matrix4X4)
@@ -862,9 +862,9 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         );
     }
 
-    public static Matrix4x4 CreateOrthographic(Box2 box2, float zNear, float zFar)
+    public static Matrix4x4 CreateOrthographic(Rect2 rect2, float zNear, float zFar)
     {
-        return CreateOrthographic(box2.Width, box2.Height, zNear, zFar);
+        return CreateOrthographic(rect2.Width, rect2.Height, zNear, zFar);
     }
     
     public static Matrix4x4 CreateOrthographic(Vector2 size, float zNear, float zFar)

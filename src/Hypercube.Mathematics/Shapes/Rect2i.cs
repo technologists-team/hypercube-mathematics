@@ -8,9 +8,9 @@ namespace Hypercube.Mathematics.Shapes;
 
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public readonly struct Box2i
+public readonly struct Rect2i
 {
-    public static readonly Box2i Zero = new(Vector2i.Zero, Vector2i.Zero);
+    public static readonly Rect2i Zero = new(Vector2i.Zero, Vector2i.Zero);
     
     public int Left => Point0.X;
     public int Top => Point0.Y;
@@ -58,33 +58,33 @@ public readonly struct Box2i
         ];
     }
     
-    public Box2i(Vector2i point0, Vector2i point1)
+    public Rect2i(Vector2i point0, Vector2i point1)
     {
         Point0 = point0;
         Point1 = point1;
     }
 
-    public Box2i(int left, int top, int right, int bottom)
+    public Rect2i(int left, int top, int right, int bottom)
     {
         Point0 = new Vector2i(left, top);
         Point1 = new Vector2i(right, bottom);
     }
 
-    public Box2i(int value)
+    public Rect2i(int value)
     {
         Point0 = new Vector2i(value);
         Point1 = new Vector2i(value);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Box2i operator +(Box2i a, Box2i b)
+    public static Rect2i operator +(Rect2i a, Rect2i b)
     {
-        return new Box2i(a.Point0 + b.Point0, a.Point1 + b.Point1);
+        return new Rect2i(a.Point0 + b.Point0, a.Point1 + b.Point1);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Box2i operator +(Box2i a, Vector2i b)
+    public static Rect2i operator +(Rect2i a, Vector2i b)
     {
-        return new Box2i(a.Point0 + b.X, a.Point1 + b.Y);
+        return new Rect2i(a.Point0 + b.X, a.Point1 + b.Y);
     }
 }
