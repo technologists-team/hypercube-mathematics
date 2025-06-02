@@ -380,11 +380,21 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         );
     }
 
-    public Rect2 Transform(Rect2 box)
+    public Rect2 Transform(Rect2 rect)
     {
-        var v1 = Transform(box.TopRight);
-        var v2 = Transform(box.BottomLeft);
+        var v1 = Transform(rect.TopRight);
+        var v2 = Transform(rect.BottomLeft);
         return new Rect2(v2.X, v1.Y, v1.X, v2.Y);
+    }
+
+    public Rect4 Transform(Rect4 rect)
+    {
+        return new Rect4(
+            Transform(rect.Point0),
+            Transform(rect.Point1),
+            Transform(rect.Point2),
+            Transform(rect.Point3)
+        );
     }
     
     public Matrix4x4 Transpose(Matrix4x4 matrix4X4)

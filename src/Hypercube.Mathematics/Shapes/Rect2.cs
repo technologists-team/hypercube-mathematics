@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Hypercube.Mathematics.Vectors;
 using JetBrains.Annotations;
@@ -6,6 +7,7 @@ using JetBrains.Annotations;
 namespace Hypercube.Mathematics.Shapes;
 
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
+[DebuggerDisplay("{ToString()}")]
 public readonly struct Rect2
 {
     public static readonly Rect2 NaN = new(Vector2.NaN, Vector2.NaN);
@@ -74,6 +76,11 @@ public readonly struct Rect2
     {
         Point0 = new Vector2(value);
         Point1 = new Vector2(value);
+    }
+    
+    public override string ToString()
+    {
+        return $"[{Point0}, {Point1}]";
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Hypercube.Mathematics.Vectors;
@@ -7,6 +8,7 @@ using JetBrains.Annotations;
 namespace Hypercube.Mathematics.Shapes;
 
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
+[DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public readonly struct Rect2i
 {
@@ -74,6 +76,11 @@ public readonly struct Rect2i
     {
         Point0 = new Vector2i(value);
         Point1 = new Vector2i(value);
+    }
+    
+    public override string ToString()
+    {
+        return $"[{Point0}, {Point1}]";
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
