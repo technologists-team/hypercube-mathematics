@@ -10,6 +10,9 @@ using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Matrices;
 
+/// <summary>
+/// Implementation of a 4x4 matrix for rendering work. (COLUM-MAJOR)
+/// </summary>
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Vector4>, IEnumerable<float>
@@ -343,7 +346,7 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     public Matrix4x4(Matrix4x4 matrix)
     {
         M00 = matrix.M00;
-        M01 = matrix.M02;
+        M01 = matrix.M01;
         M02 = matrix.M02;
         M03 = matrix.M03;
         M10 = matrix.M10;
@@ -562,36 +565,7 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     
     public static Matrix4x4 CreateTransform(Vector3 position, Quaternion quaternion, Vector3 scale)
     {
-        var xx = quaternion.X * quaternion.X;
-        var yy = quaternion.Y * quaternion.Y;
-        var zz = quaternion.Z * quaternion.Z;
-
-        var xy = quaternion.X * quaternion.Y;
-        var wz = quaternion.Z * quaternion.W;
-        var xz = quaternion.Z * quaternion.X;
-        var wy = quaternion.Y * quaternion.W;
-        var yz = quaternion.Y * quaternion.Z;
-        var wx = quaternion.X * quaternion.W;
-
-        var rx1 = (1.0f - 2.0f * (yy + zz)) * scale.X;
-        var rx2 = 2.0f * (xy + wz) * scale.X;
-        var rx3 = 2.0f * (xz - wy) * scale.X;
-        var rx4 = rx1 * position.X + rx2 * position.X + rx3 * position.X;
-        var ry1 = 2.0f * (xy - wz) * scale.Y;
-        var ry2 = (1.0f - 2.0f * (zz + xx)) * scale.Y;
-        var ry3 = 2.0f * (yz + wx) * scale.Y;
-        var ry4 = ry1 * position.Y + ry2 * position.Y + ry3 * position.Y;
-        var rz1 = 2.0f * (xz + wy) * scale.Z;
-        var rz2 = 2.0f * (yz - wx) * scale.Z;
-        var rz3 = (1.0f - 2.0f * (yy + xx)) * scale.Z;
-        var rz4 = rz1 * position.Z + rz2 * position.Z + rz3 * position.Z;
-        
-        return new Matrix4x4(
-            rx1, rx2, rx3, rx4,
-            ry1, ry2, ry3, ry4,
-            rz1, rz2, rz3, rz4,
-            0, 0, 0, 1
-        );
+        return CreateTranslation(position) * CreateRotation(quaternion) * CreateScale(scale);
     }
 
     /// <summary>
@@ -776,61 +750,105 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     /// <summary>
     /// Creating translate matrix
     /// <code>
-    ///  1  |  0  |  0  |  v 
-    ///  0  |  1  |  0  |  v
-    ///  0  |  0  |  1  |  v
-    ///  0  |  0  |  0  |  1
+    ///  1  |  0  |  0  |  0 
+    ///  0  |  1  |  0  |  0
+    ///  0  |  0  |  1  |  0
+    ///  v  |  v  |  v  |  1
     /// </code>
     /// </summary>
-    public static Matrix4x4 CreateTranslation(float value)
+    public static Matrix4x4 CreateTranslation(float v)
     {
-        return CreateTranslation(value, value, value);
+        return new Matrix4x4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            v, v, v, 1
+        );
+    }
+    
+    /// <summary>
+    /// Creating translate matrix
+    /// <code>
+    ///  1  |  0  |  0  |  0 
+    ///  0  |  1  |  0  |  0
+    ///  0  |  0  |  1  |  0
+    ///  x  |  y  |  0  |  1
+    /// </code>
+    /// </summary>
+    public static Matrix4x4 CreateTranslation(float x, float y)
+    {
+        return new Matrix4x4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            x, y, 0, 1
+        );
     }
 
     /// <summary>
     /// Creating translate matrix
     /// <code>
-    ///  1  |  0  |  0  |  x 
-    ///  0  |  1  |  0  |  y
+    ///  1  |  0  |  0  |  0 
+    ///  0  |  1  |  0  |  0
     ///  0  |  0  |  1  |  0
-    ///  0  |  0  |  0  |  1
+    ///  x  |  y  |  0  |  1
     /// </code>
     /// </summary>
     public static Matrix4x4 CreateTranslation(Vector2 vector)
     {
-        return CreateTranslation(vector.X, vector.Y, 0);
+        return new Matrix4x4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            vector.X, vector.Y, 0, 1
+        );
     }
 
     /// <summary>
     /// Creating translate matrix
     /// <code>
-    ///  1  |  0  |  0  |  x 
-    ///  0  |  1  |  0  |  y
-    ///  0  |  0  |  1  |  z
-    ///  0  |  0  |  0  |  1
+    ///  1  |  0  |  0  |  0 
+    ///  0  |  1  |  0  |  0
+    ///  0  |  0  |  1  |  0
+    ///  x  |  y  |  z  |  1
     /// </code>
     /// </summary>
     public static Matrix4x4 CreateTranslation(Vector3 vector)
     {
-        return CreateTranslation(vector.X, vector.Y, vector.Z);
+        return new Matrix4x4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            vector.X, vector.Y, vector.Z, 1
+        );
     }
 
     /// <summary>
-    /// Creating translate matrix
+    /// Creating translate matrix. (column-major)
     /// <code>
-    ///  1  |  0  |  0  |  x 
-    ///  0  |  1  |  0  |  y
-    ///  0  |  0  |  1  |  z
-    ///  0  |  0  |  0  |  1
+    ///  1  |  0  |  0  |  0 
+    ///  0  |  1  |  0  |  0
+    ///  0  |  0  |  1  |  0
+    ///  x  |  y  |  z  |  1
     /// </code>
     /// </summary>
+    /// <remarks>
+    /// In the course of development, I came across an interesting observation.
+    /// There are two following conventions for the format of the matrix: row-major and column-major
+    /// where we place the vector {x, y, z, 1} or in the last column and column accordingly.
+    /// I realize the work with OpenGL and assume the work with it.
+    ///
+    /// But remember that:
+    /// - OpenGL traditionally uses column-major
+    /// - DirectX uses row-major
+    /// </remarks>
     public static Matrix4x4 CreateTranslation(float x, float y, float z)
     {
         return new Matrix4x4(
-            1, 0, 0, x,
-            0, 1, 0, y,
-            0, 0, 1, z,
-            0, 0, 0, 1
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            x, y, z, 1
         );
     }
 
