@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Hypercube.Mathematics.Extensions;
 using Hypercube.Mathematics.Vectors;
@@ -159,4 +160,44 @@ public readonly struct Color
     {
         return $"#{ByteR:X2}{ByteG:X2}{ByteB:X2}{ByteA:X2}";
     }
+    
+    #region Implicit
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator (byte, byte, byte)(Color color)
+    {
+        return (color.ByteR, color.ByteG, color.ByteB);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator (byte, byte, byte, byte)(Color color)
+    {
+        return (color.ByteR, color.ByteG, color.ByteB, color.ByteA);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator int(Color color)
+    {
+        return color.Int;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator uint(Color color)
+    {
+        return color.Uint;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Vector3(Color color)
+    {
+        return color.Vec3;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Vector4(Color color)
+    {
+        return color.Vec4;
+    }
+    
+    #endregion
 }
