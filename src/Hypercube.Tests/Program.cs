@@ -20,5 +20,9 @@ public static class Program
         Console.WriteLine(((Matrix4x4) numericsMatrix).ToString());
         Console.WriteLine("======");
         Console.WriteLine(hyperMatrix.ToString());
+        Console.WriteLine("======");
+        Console.WriteLine(Color.Red);
+        Console.WriteLine(Color.Red.Int);
+        Console.WriteLine(new Color(-16776961));
     }
 }
