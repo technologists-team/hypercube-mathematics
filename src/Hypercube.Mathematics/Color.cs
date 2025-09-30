@@ -10,8 +10,6 @@ namespace Hypercube.Mathematics;
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 public readonly struct Color
 {
-    private const float DefaultAlpha = 1f;
-    
     #region Colors
     
     public static readonly Color White        = new("ffffff");
@@ -58,66 +56,61 @@ public readonly struct Color
     public static readonly Color SaddleBrown  = new("8b4513");
         
     #endregion
-
-    #region To byte
-
-    public byte ByteR => (byte) (R * byte.MaxValue);
-    public byte ByteG => (byte) (G * byte.MaxValue);
-    public byte ByteB => (byte) (B * byte.MaxValue);
-    public byte ByteA => (byte) (A * byte.MaxValue);
-
-    #endregion
     
-    public int Int => (ByteR << 24) | (ByteG << 12) | (ByteB << 8) | ByteA;
+    public float NormalizedR => R.ByteToNormalizedFloat();
+    public float NormalizedG => G.ByteToNormalizedFloat();
+    public float NormalizedB => B.ByteToNormalizedFloat();
+    public float NormalizedA => A.ByteToNormalizedFloat();
+    public int Int => (R << 24) | (G << 12) | (B << 8) | A;
     public uint Uint => (uint) Int;
-    public Vector3 Vec3 => new(R, G, B);
-    public Vector4 Vec4 => new(R, G, B, A);
+    public Vector3 Vec3 => new(NormalizedR, NormalizedG, NormalizedB);
+    public Vector4 Vec4 => new(NormalizedR, NormalizedG, NormalizedB, NormalizedA);
     public Color Abgr => new(A, B, G, R);
     public Color Bgr => new(B, G, R);
     
-    public readonly float R;
-    public readonly float G;
-    public readonly float B;
-    public readonly float A;
-
-    public Color(int value)
-    {
-        R = ((value >> 24) & 0xFF).ByteToNormalizedFloat();
-        G = ((value >> 16) & 0xFF).ByteToNormalizedFloat();
-        B = ((value >> 8) & 0xFF).ByteToNormalizedFloat();
-        A = (value & 0xFF).ByteToNormalizedFloat();
-    }
+    public readonly byte R;
+    public readonly byte G;
+    public readonly byte B;
+    public readonly byte A;
     
-    public Color(float r, float g, float b, float a = DefaultAlpha)
+    public Color(byte r, byte g, byte b, byte a = byte.MaxValue)
     {
         R = r;
         G = g;
         B = b;
         A = a;
     }
-
-    public Color(byte r, byte g, byte b, byte a = byte.MaxValue)
+    
+    public Color(int value)
     {
-        R = r.ByteToNormalizedFloat();
-        G = g.ByteToNormalizedFloat();
-        B = b.ByteToNormalizedFloat();
-        A = a.ByteToNormalizedFloat();
+        R = (byte) ((value >> 24) & 0xFF);
+        G = (byte) ((value >> 16) & 0xFF);
+        B = (byte) ((value >> 8) & 0xFF);
+        A = (byte) (value & 0xFF);
     }
     
-    public Color(Vector3 vector, float a = DefaultAlpha)
+    public Color(float r, float g, float b, float a = 1f)
     {
-        R = vector.X;
-        G = vector.Y;
-        B = vector.Z;
-        A = a;
+        R = r.NormalizedFloatToByte();
+        G = g.NormalizedFloatToByte();
+        B = b.NormalizedFloatToByte();
+        A = a.NormalizedFloatToByte();
+    }
+    
+    public Color(Vector3 vector, float a = 1f)
+    {
+        R = vector.X.NormalizedFloatToByte();
+        G = vector.Y.NormalizedFloatToByte();
+        B = vector.Z.NormalizedFloatToByte();
+        A = a.NormalizedFloatToByte();
     }
 
     public Color(Vector4 vector)
     {
-        R = vector.X;
-        G = vector.Y;
-        B = vector.Z;
-        A = vector.W;
+        R = vector.X.NormalizedFloatToByte();
+        G = vector.Y.NormalizedFloatToByte();
+        B = vector.Z.NormalizedFloatToByte();
+        A = vector.W.NormalizedFloatToByte();
     }
     
     public Color(Color color)
@@ -135,22 +128,22 @@ public readonly struct Color
     /// <exception cref="ArgumentException">Thrown if the hex string is invalid.</exception>
     public Color(string hex)
     {
+        const char prefix = '#';
         const int rgbSize = 6;
         const int rgbaSize = 8;
         
-        if (hex.StartsWith('#'))
+        if (hex.StartsWith(prefix))
             hex = hex[1..];
 
         if (hex.Length != rgbSize && hex.Length != rgbaSize)
             throw new ArgumentException("Hex string must be 6 (RGB) or 8 (RGBA) characters long.");
 
-        R = int.Parse(hex.Substring(0, 2), NumberStyles.HexNumber).ByteToNormalizedFloat();
-        G = int.Parse(hex.Substring(2, 2), NumberStyles.HexNumber).ByteToNormalizedFloat();
-        B = int.Parse(hex.Substring(4, 2), NumberStyles.HexNumber).ByteToNormalizedFloat();
-        
+        R = byte.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+        G = byte.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
+        B = byte.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
         A = hex.Length == rgbaSize
-            ? int.Parse(hex.Substring(6, 2), NumberStyles.HexNumber).ByteToNormalizedFloat()
-            : DefaultAlpha;
+            ? byte.Parse(hex.Substring(6, 2), NumberStyles.HexNumber)
+            : byte.MaxValue;
     }
 
     /// <summary>
@@ -158,7 +151,7 @@ public readonly struct Color
     /// </summary>
     public override string ToString()
     {
-        return $"#{ByteR:X2}{ByteG:X2}{ByteB:X2}{ByteA:X2}";
+        return $"#{R:X2}{G:X2}{B:X2}{A:X2}";
     }
     
     #region Implicit
@@ -166,25 +159,25 @@ public readonly struct Color
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator (byte, byte, byte)(Color color)
     {
-        return (color.ByteR, color.ByteG, color.ByteB);
+        return (color.R, color.G, color.B);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator (byte, byte, byte, byte)(Color color)
     {
-        return (color.ByteR, color.ByteG, color.ByteB, color.ByteA);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator int(Color color)
-    {
-        return color.Int;
+        return (color.R, color.G, color.B, color.A);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator uint(Color color)
+    public static implicit operator (float, float, float)(Color color)
     {
-        return color.Uint;
+        return (color.NormalizedR, color.NormalizedG, color.NormalizedB);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator (float, float, float, float)(Color color)
+    {
+        return (color.NormalizedR, color.NormalizedG, color.NormalizedB, color.NormalizedA);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
