@@ -88,22 +88,23 @@ public static class HyperMath
     /// </summary>
     public const float DegreesToRadiansF = PIf / 180;
 
+    public const float FloatTolerance = 1e-15f;
+    public const double DoubleTolerance = 1e-15d;
+    
     /// <summary>
     /// Determines whether two floating-point values are approximately equal, within a specified tolerance.
     /// </summary>
-    public static bool AboutEquals(float a, float b, float tolerance = 1E-15f)
+    public static bool AboutEquals(float a, float b, float tolerance = FloatTolerance)
     {
-        var epsilon = Math.Max(Math.Abs(a), Math.Abs(b)) * tolerance;
-        return Math.Abs(a - b) <= epsilon;
+        return float.Abs(a - b) <= float.Max(float.Abs(a), float.Abs(b)) * tolerance;
     }
 
     /// <summary>
     /// Determines whether two double-precision values are approximately equal, within a specified tolerance.
     /// </summary>
-    public static bool AboutEquals(double a, double b, double tolerance = 1E-15d)
+    public static bool AboutEquals(double a, double b, double tolerance = DoubleTolerance)
     {
-        var epsilon = Math.Max(Math.Abs(a), Math.Abs(b)) * tolerance;
-        return Math.Abs(a - b) <= epsilon;
+        return double.Abs(a - b) <= double.Max(double.Abs(a), double.Abs(b)) * tolerance;
     }
 
     /// <summary>
@@ -152,9 +153,12 @@ public static class HyperMath
     /// </summary>
     public static int MoveTowards(int current, int target, int distance)
     {
+        if (distance < 0)
+            throw new ArgumentOutOfRangeException(nameof(distance), "Distance must be non-negative.");
+        
         return current < target ?
-            Math.Min(current + distance, target) :
-            Math.Max(current - distance, target);
+            int.Min(current + distance, target) :
+            int.Max(current - distance, target);
     }
 
     /// <summary>
@@ -163,8 +167,8 @@ public static class HyperMath
     public static nint MoveTowards(nint current, nint target, nint distance)
     {
         return current < target ?
-            Math.Min(current + distance, target) :
-            Math.Max(current - distance, target);
+            nint.Min(current + distance, target) :
+            nint.Max(current - distance, target);
     }
     
     /// <summary>
@@ -173,8 +177,8 @@ public static class HyperMath
     public static long MoveTowards(long current, long target, long distance)
     {
         return current < target ?
-            Math.Min(current + distance, target) :
-            Math.Max(current - distance, target);
+            long.Min(current + distance, target) :
+            long.Max(current - distance, target);
     }
     
     /// <summary>
@@ -183,8 +187,8 @@ public static class HyperMath
     public static ulong MoveTowards(ulong current, ulong target, ulong distance)
     {
         return current < target ?
-            Math.Min(current + distance, target) :
-            Math.Max(current - distance, target);
+            ulong.Min(current + distance, target) :
+            ulong.Max(current - distance, target);
     }
 
     /// <summary>
@@ -193,8 +197,8 @@ public static class HyperMath
     public static uint MoveTowards(uint current, uint target, uint distance)
     {
         return current < target ?
-            Math.Min(current + distance, target) :
-            Math.Max(current - distance, target);
+            uint.Min(current + distance, target) :
+            uint.Max(current - distance, target);
     }
     
     /// <summary>
@@ -203,8 +207,8 @@ public static class HyperMath
     public static float MoveTowards(float current, float target, float distance)
     {
         return current < target ?
-            MathF.Min(current + distance, target) :
-            MathF.Max(current - distance, target);
+            float.Min(current + distance, target) :
+            float.Max(current - distance, target);
     }
     
     /// <summary>
@@ -213,7 +217,7 @@ public static class HyperMath
     public static double MoveTowards(double current, double target, double distance)
     {
         return current < target ?
-            Math.Min(current + distance, target) :
-            Math.Max(current - distance, target);
+            double.Min(current + distance, target) :
+            double.Max(current - distance, target);
     }
 }
