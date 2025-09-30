@@ -9,15 +9,9 @@ public readonly partial struct Vector3
      */
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Vector2(Vector3 vector)
+    public static implicit operator Vector3i(Vector3 vector)
     {
-        return new Vector2(vector.X, vector.Y);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Vector2i(Vector3 vector)
-    {
-        return new Vector2i((int)vector.X, (int)vector.Y);
+        return new Vector3i((int) vector.X, (int) vector.Y, (int) vector.Z);
     }
     
     /*

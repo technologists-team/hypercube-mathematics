@@ -350,6 +350,14 @@ public readonly partial struct Vector3 : IEquatable<Vector3>, IComparable<Vector
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Vector3 other, float tolerance)
+    {
+        return X.AboutEquals(other.X, tolerance) &&
+               Y.AboutEquals(other.Y, tolerance) &&
+               Y.AboutEquals(other.Z, tolerance);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
         return obj is Vector3 other && Equals(other);
@@ -482,13 +490,13 @@ public readonly partial struct Vector3 : IEquatable<Vector3>, IComparable<Vector
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float DistanceSquared(Vector2 valueA, Vector2 valueB)
+    public static float DistanceSquared(Vector3 valueA, Vector3 valueB)
     {
         return (valueA - valueB).LengthSquared;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Distance(Vector2 valueA, Vector2 valueB)
+    public static float Distance(Vector3 valueA, Vector3 valueB)
     {
         return (valueA - valueB).Length;
     }
@@ -554,71 +562,71 @@ public readonly partial struct Vector3 : IEquatable<Vector3>, IComparable<Vector
     public static Vector3 Max(Vector3 valueA, Vector3 valueB)
     {
         return new Vector3(
-            MathF.Max(valueA.X, valueB.X),
-            MathF.Max(valueA.Y, valueB.Y),
-            MathF.Max(valueA.Z, valueB.Z));
+            float.Max(valueA.X, valueB.X),
+            float.Max(valueA.Y, valueB.Y),
+            float.Max(valueA.Z, valueB.Z));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Min(Vector3 valueA, Vector3 valueB)
     {
         return new Vector3(
-            MathF.Min(valueA.X, valueB.X),
-            MathF.Min(valueA.Y, valueB.Y),
-            MathF.Min(valueA.Z, valueB.Z));
+            float.Min(valueA.X, valueB.X),
+            float.Min(valueA.Y, valueB.Y),
+            float.Min(valueA.Z, valueB.Z));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Abs(Vector3 value)
     {
         return new Vector3(
-            Math.Abs(value.X),
-            Math.Abs(value.Y),
-            Math.Abs(value.Z));
+            float.Abs(value.X),
+            float.Abs(value.Y),
+            float.Abs(value.Z));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Round(Vector3 value)
     {
         return new Vector3(
-            Math.Round(value.X),
-            Math.Round(value.Y),
-            Math.Round(value.Z));
+            float.Round(value.X),
+            float.Round(value.Y),
+            float.Round(value.Z));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Round(Vector3 value, int digits)
     {
         return new Vector3(
-            Math.Round(value.X, digits),
-            Math.Round(value.Y, digits),
-            Math.Round(value.Z, digits));
+            float.Round(value.X, digits),
+            float.Round(value.Y, digits),
+            float.Round(value.Z, digits));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Ceiling(Vector3 value)
     {
         return new Vector3(
-            Math.Ceiling(value.X),
-            Math.Ceiling(value.Y),
-            Math.Ceiling(value.Z));
+            float.Ceiling(value.X),
+            float.Ceiling(value.Y),
+            float.Ceiling(value.Z));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Floor(Vector3 value)
     {
         return new Vector3(
-            Math.Floor(value.X),
-            Math.Floor(value.Y),
-            Math.Floor(value.Z));
+            float.Floor(value.X),
+            float.Floor(value.Y),
+            float.Floor(value.Z));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Sign(Vector3 value)
     {
         return new Vector3(
-            Math.Sign(value.X),
-            Math.Sign(value.Y),
-            Math.Sign(value.Z));
+            float.Sign(value.X),
+            float.Sign(value.Y),
+            float.Sign(value.Z));
     }
 }

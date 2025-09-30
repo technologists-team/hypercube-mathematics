@@ -310,12 +310,19 @@ public readonly partial struct Vector2 : IEquatable<Vector2>, IComparable<Vector
     {
         return GetEnumerator();
     }
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Vector2 other)
     {
         return X.AboutEquals(other.X) &&
                Y.AboutEquals(other.Y);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Vector2 other, float tolerance)
+    {
+        return X.AboutEquals(other.X, tolerance) &&
+               Y.AboutEquals(other.Y, tolerance);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -546,63 +553,63 @@ public readonly partial struct Vector2 : IEquatable<Vector2>, IComparable<Vector
     public static Vector2 Max(Vector2 valueA, Vector2 valueB)
     {
         return new Vector2(
-            MathF.Max(valueA.X, valueB.X),
-            MathF.Max(valueA.Y, valueB.Y));
+            float.Max(valueA.X, valueB.X),
+            float.Max(valueA.Y, valueB.Y));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Min(Vector2 valueA, Vector2 valueB)
     {
         return new Vector2(
-            MathF.Min(valueA.X, valueB.X),
-            MathF.Min(valueA.Y, valueB.Y));
+            float.Min(valueA.X, valueB.X),
+            float.Min(valueA.Y, valueB.Y));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Abs(Vector2 value)
     {
         return new Vector2(
-            Math.Abs(value.X),
-            Math.Abs(value.Y));
+            float.Abs(value.X),
+            float.Abs(value.Y));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Round(Vector2 value)
     {
         return new Vector2(
-            Math.Round(value.X),
-            Math.Round(value.Y));
+            float.Round(value.X),
+            float.Round(value.Y));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Round(Vector2 value, int digits)
     {
         return new Vector2(
-            Math.Round(value.X, digits),
-            Math.Round(value.Y, digits));
+            float.Round(value.X, digits),
+            float.Round(value.Y, digits));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Ceiling(Vector2 value)
     {
         return new Vector2(
-            Math.Ceiling(value.X),
-            Math.Ceiling(value.Y));
+            float.Ceiling(value.X),
+            float.Ceiling(value.Y));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Floor(Vector2 value)
     {
         return new Vector2(
-            Math.Floor(value.X),
-            Math.Floor(value.Y));
+            float.Floor(value.X),
+            float.Floor(value.Y));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Sign(Vector2 value)
     {
         return new Vector2(
-            Math.Sign(value.X),
-            Math.Sign(value.Y));
+            float.Sign(value.X),
+            float.Sign(value.Y));
     }
 }

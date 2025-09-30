@@ -17,9 +17,27 @@ public readonly partial struct Vector2i
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Vector2d(Vector2i vector)
+    {
+        return new Vector2d(vector.X, vector.Y);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector3(Vector2i vector)
     {
         return new Vector3(vector.X, vector.Y, 0f);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Vector3i(Vector2i vector)
+    {
+        return new Vector3i(vector.X, vector.Y, 0);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Vector4(Vector2i vector)
+    {
+        return new Vector4(vector.X, vector.Y, 0f, 0f);
     }
     
     /*

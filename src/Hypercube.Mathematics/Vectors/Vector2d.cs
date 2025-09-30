@@ -317,6 +317,13 @@ public readonly partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vect
         return X.AboutEquals(other.X) &&
                Y.AboutEquals(other.Y);
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Vector2 other, double tolerance)
+    {
+        return X.AboutEquals(other.X, tolerance) &&
+               Y.AboutEquals(other.Y, tolerance);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
