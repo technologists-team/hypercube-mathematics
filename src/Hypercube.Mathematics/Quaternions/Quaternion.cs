@@ -33,7 +33,7 @@ public readonly struct Quaternion : IEquatable<Quaternion>
     public Vector3 Direction
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Vector.XYZ;
+        get => Vector.Xyz;
     }
     
     public Angle Angle

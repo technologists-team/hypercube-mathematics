@@ -125,10 +125,16 @@ public readonly partial struct Vector3 : IEquatable<Vector3>, IComparable<Vector
         get => X * Y * Z;
     }
 
-    public Vector2 XY
+    public Vector2 Xy
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => new(X, Y);
+    }
+
+    public Color Color
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(this);
     }
     
     public float this[int index]
