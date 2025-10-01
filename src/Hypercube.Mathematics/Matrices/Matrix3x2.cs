@@ -1,100 +1,237 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Hypercube.Mathematics.Extensions;
 using Hypercube.Mathematics.Vectors;
 using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Matrices;
 
-[PublicAPI]
+[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
+[DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public partial struct Matrix3x2
+public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>
 {
-    public static Matrix3x2 Zero => new(Vector2.Zero);
-    public static Matrix3x2 One => new(Vector2.One);
-    public static Matrix3x2 Identity => new(Vector2.UnitX, Vector2.UnitY, Vector2.Zero);
+    /// <value>
+    /// <code>
+    ///  NaN, NaN
+    ///  NaN, NaN
+    ///  NaN, NaN
+    /// </code>
+    /// </value>
+    public static readonly Matrix3x2 NaN = new(float.NaN, float.NaN,float.NaN, float.NaN, float.NaN, float.NaN);
+    
+    /// <value>
+    /// <code>
+    ///  0, 0
+    ///  0, 0
+    ///  0, 0
+    /// </code>
+    /// </value>
+    public static readonly Matrix3x2 Zero = new(0, 0, 0, 0, 0, 0);
+    
+    /// <value>
+    /// <code>
+    ///  1, 1
+    ///  1, 1
+    ///  1, 1   
+    /// </code>
+    /// </value>
+    public static readonly Matrix3x2 One = new(1, 1, 1, 1, 1, 1);
+    
+    /// <value>
+    /// <code>
+    ///  1, 0
+    ///  0, 1
+    ///  0, 0   
+    /// </code>
+    /// </value>
+    public static readonly Matrix3x2 Identity = new(1, 0, 0, 1, 0, 0);
 
-    public readonly Vector2 Row0;
-    public readonly Vector2 Row1;
-    public readonly Vector2 Row2;
+    public Vector2 Row0
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M00, M01);
+    }
 
-    public Vector3 Column0 => new(M00, M10, M20);
-    public Vector3 Column1 => new(M01, M11, M21);
+    public Vector2 Row1
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M10, M11);
+    }
+
+    public Vector2 Row2
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M20, M21);
+    }
+
+    public Vector3 Column0
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M00, M10, M20);
+    }
+
+    public Vector3 Column1
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M01, M11, M21);
+    }
 
     /// <summary>
     /// Matrix x: 0, y: 0 element.
     /// </summary>
-    public float M00
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Row0.X;
-    }
-
-    /// <summary>
-    /// Matrix x: 1, y: 0 element.
-    /// </summary>
-    public float M01
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Row0.Y;
-    }
-
+    public readonly float M00;
+    
     /// <summary>
     /// Matrix x: 0, y: 1 element.
     /// </summary>
-    public float M10
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Row1.X;
-    }
-
+    public readonly float M01;
+    
+    /// <summary>
+    /// Matrix x: 1, y: 0 element.
+    /// </summary>
+    public readonly float M10;
+    
     /// <summary>
     /// Matrix x: 1, y: 1 element.
     /// </summary>
-    public float M11
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Row1.Y;
-    }
-
+    public readonly float M11;
+    
     /// <summary>
-    /// Matrix x: 0, y: 2 element.
+    /// Matrix x: 2, y: 0 element.
     /// </summary>
-    public float M20
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Row2.X;
-    }
-
+    public readonly float M20;
+    
     /// <summary>
-    /// Matrix x: 1, y: 2 element.
+    /// Matrix x: 2, y: 1 element.
     /// </summary>
-    public float M21
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Row2.Y;
-    }
-
+    public readonly float M21;
+    
     public Matrix3x2(float m00, float m01, float m10, float m11, float m20, float m21)
     {
-        Row0 = new Vector2(m00, m01);
-        Row1 = new Vector2(m10, m11);
-        Row2 = new Vector2(m20, m21);
+        M00 = m00;
+        M01 = m01;
+        M10 = m10;
+        M11 = m11;
+        M20 = m20;
+        M21 = m21;
     }
-
-    public Matrix3x2(Vector2 vector)
-    {
-        Row0 = vector;
-        Row1 = vector;
-        Row2 = vector;
-    }
-
+    
     public Matrix3x2(Vector2 row0, Vector2 row1, Vector2 row2)
     {
-        Row0 = row0;
-        Row1 = row1;
-        Row2 = row2;
+        M00 = row0.X;
+        M01 = row0.Y;
+        M10 = row1.X;
+        M11 = row1.Y;
+        M20 = row2.X;
+        M21 = row2.Y;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out float m00, out float m01, out float m10, out float m11, out float m20, out float m21)
+    {
+        m00 = M00;
+        m01 = M01;
+        m10 = M10;
+        m11 = M11;
+        m20 = M20;
+        m21 = M21;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out Vector2 row0, out Vector2 row1, out Vector2 row2)
+    {
+        row0 = Row0;
+        row1 = Row1;
+        row2 = Row2;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Matrix3x2 Transform(Matrix3x2 matrix)
+    {
+        return Multiply(this, matrix);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Transform(Vector2 vector)
+    {
+        return Multiply(this, vector);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Matrix3x2 other)
+    {
+        return M00.AboutEquals(other.M00) && M01.AboutEquals(other.M01) &&
+               M10.AboutEquals(other.M10) && M11.AboutEquals(other.M11) &&
+               M20.AboutEquals(other.M20) && M21.AboutEquals(other.M21);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override bool Equals(object? obj)
+    {
+        return obj is Matrix3x2 m && Equals(m);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(M00, M01, M10, M11, M20, M21);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override string ToString()
+    {
+        return $"{M00}, {M01}, {M10}, {M11}, {M20}, {M21}";
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(Matrix3x2 a, Matrix3x2 b)
+    {
+        return a.Equals(b);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Matrix3x2 a, Matrix3x2 b)
+    {
+        return !a.Equals(b);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x2 operator *(Matrix3x2 a, Matrix3x2 b)
+    {
+        return Multiply(a, b);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 operator *(Matrix3x2 a, Vector2 b)
+    {
+        return Multiply(a, b);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 Multiply(Matrix3x2 a, Vector2 b)
+    {
+        return new Vector2(
+            b.X * a.M00 + b.Y * a.M10 + a.M20,
+            b.X * a.M01 + b.Y * a.M11 + a.M21
+        );
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x2 Multiply(Matrix3x2 a, Matrix3x2 b)
+    {
+        return new Matrix3x2(
+            a.M00 * b.M00 + a.M01 * b.M10,
+            a.M00 * b.M01 + a.M01 * b.M11,
+            a.M10 * b.M00 + a.M11 * b.M10,
+            a.M10 * b.M01 + a.M11 * b.M11,
+            a.M20 * b.M00 + a.M21 * b.M10 + b.M20,
+            a.M20 * b.M01 + a.M21 * b.M11 + b.M21
+        );
+    }
+    
     /// <summary>
     /// Creating translation matrix
     /// <code>
@@ -148,8 +285,8 @@ public partial struct Matrix3x2
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x2 CreateRotation(double angle)
     {
-        var cos = (float) Math.Cos(angle);
-        var sin = (float) Math.Sin(angle);
+        var cos = (float) double.Cos(angle);
+        var sin = (float) double.Sin(angle);
         return new Matrix3x2(cos, sin, -sin, cos, 0, 0);
     }
     
@@ -178,15 +315,6 @@ public partial struct Matrix3x2
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x2 CreateScale(float x, float y)
     {
-        return new Matrix3x2(x, 0, y, 0, 0, 0);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2 Transform(Vector2 v)
-    {
-        return new Vector2(
-            v.X * M00 + v.Y * M10 + M20,
-            v.X * M01 + v.Y * M11 + M21
-        );
+        return new Matrix3x2(x, 0, 0, y, 0, 0);
     }
 }

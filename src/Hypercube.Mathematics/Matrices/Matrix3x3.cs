@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Hypercube.Mathematics.Extensions;
 using Hypercube.Mathematics.Vectors;
@@ -11,44 +12,94 @@ namespace Hypercube.Mathematics.Matrices;
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, IEnumerable<float>
 {
-    /// <summary>
+    /// <value>
     /// <code>
-    ///  0 | 0 | 0
-    ///  0 | 0 | 0
-    ///  0 | 0 | 0
+    /// NaN, NaN, NaN
+    /// NaN, NaN, NaN
+    /// NaN, NaN, NaN
     /// </code>
-    /// </summary>
-    public static readonly Matrix3x3 Zero = new(0);
+    /// </value>
+    public static readonly Matrix3x3 NaN = new(
+        float.NaN, float.NaN, float.NaN,
+        float.NaN, float.NaN, float.NaN,
+        float.NaN, float.NaN, float.NaN
+    );
     
-    /// <summary>
+    /// <value>
     /// <code>
-    ///  1 | 1 | 1
-    ///  1 | 1 | 1
-    ///  1 | 1 | 1
+    /// 0, 0, 0
+    /// 0, 0, 0
+    /// 0, 0, 0
     /// </code>
-    /// </summary>
-    public static readonly Matrix3x3 One = new(1);
+    /// </value>
+    public static readonly Matrix3x3 Zero = new(
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0
+    );
     
-    /// <summary>
+    /// <value>
     /// <code>
-    ///  1 | 0 | 0
-    ///  0 | 1 | 0
-    ///  0 | 0 | 1
+    /// 1, 1, 1
+    /// 1, 1, 1
+    /// 1, 1, 1
     /// </code>
-    /// </summary>
+    /// </value>
+    public static readonly Matrix3x3 One = new(
+        1, 1, 1,
+        1, 1, 1,
+        1, 1, 1
+    );
+    
+    /// <value>
+    /// <code>
+    /// 1, 0, 0
+    /// 0, 1, 0
+    /// 0, 0, 1
+    /// </code>
+    /// </value>
     public static readonly Matrix3x3 Identity = new(
         1, 0, 0,
         0, 1, 0,
         0, 0, 1
     );
     
-    public Vector3 Row0 => new(M00, M01, M02);
-    public Vector3 Row1 => new(M10, M11, M12);
-    public Vector3 Row2 => new(M20, M21, M22);
-    public Vector3 Column0 => new(M00, M10, M20);
-    public Vector3 Column1 => new(M01, M11, M21);
-    public Vector3 Column2 => new(M02, M12, M22);
-    
+    public Vector3 Row0
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M00, M01, M02);
+    }
+
+    public Vector3 Row1
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M10, M11, M12);
+    }
+
+    public Vector3 Row2
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M20, M21, M22);
+    }
+
+    public Vector3 Column0
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M00, M10, M20);
+    }
+
+    public Vector3 Column1
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M01, M11, M21);
+    }
+
+    public Vector3 Column2
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M02, M12, M22);
+    }
+
     /// <summary>
     /// Matrix x: 0, y: 0 element.
     /// </summary>
@@ -94,6 +145,26 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     /// </summary>
     public readonly float M22;
 
+    public Matrix3x3 Transposed
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(
+            M00, M10, M20,
+            M01, M11, M21,
+            M02, M12, M22
+        );
+    }
+
+    public float[] Array
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => [
+            M00, M10, M20,
+            M01, M11, M21,
+            M02, M12, M22
+        ];
+    }
+    
     public float this[int x, int y] =>
         y switch
         {
@@ -120,34 +191,13 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
             },
             _ => throw new ArgumentOutOfRangeException(nameof(y), y, null)
         };
-
-    /// <summary>
-    /// Creates 3x3 matrix
-    /// <code>
-    /// value | value | value
-    /// value | value | value
-    /// value | value | value
-    /// </code>
-    /// </summary>
-    public Matrix3x3(float value)
-    {
-        M00 = value;
-        M01 = value;
-        M02 = value;
-        M10 = value;
-        M11 = value;
-        M12 = value;
-        M20 = value;
-        M21 = value;
-        M22 = value;
-    }
     
     /// <summary>
-    /// Creates 3x3 matrix
+    /// Creates 3x3 matrix.
     /// <code>
-    ///  m00 | m01 | m02
-    ///  m10 | m11 | m12
-    ///  m20 | m21 | m22
+    ///  m00, m01, m02
+    ///  m10, m11, m12
+    ///  m20, m21, m22
     /// </code>
     /// </summary>
     public Matrix3x3(
@@ -169,51 +219,30 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     /// <summary>
     /// Creates 3x3 matrix
     /// <code>
-    /// value.X | value.Y | value.Z
-    /// value.X | value.Y | value.Z
-    /// value.X | value.Y | value.Z
-    /// </code>
-    /// </summary>
-    public Matrix3x3(Vector3 value)
-    {
-        M00 = value.X;
-        M01 = value.Y;
-        M02 = value.Z;
-        M10 = value.X;
-        M11 = value.Y;
-        M12 = value.Z;
-        M20 = value.X;
-        M21 = value.Y;
-        M22 = value.Z;
-    }
-    
-    /// <summary>
-    /// Creates 3x3 matrix
-    /// <code>
     ///  x.X | x.Y | x.Z
     ///  y.X | y.Y | y.Z
     ///  z.X | z.Y | z.Z
     /// </code>
     /// </summary>
-    public Matrix3x3(Vector3 x, Vector3 y, Vector3 z)
+    public Matrix3x3(Vector3 row0, Vector3 row1, Vector3 row2)
     {
-        M00 = x.X;
-        M01 = x.Y;
-        M02 = x.Z;
-        M10 = y.X;
-        M11 = y.Y;
-        M12 = y.Z;
-        M20 = z.X;
-        M21 = z.Y;
-        M22 = z.Z;
+        M00 = row0.X;
+        M01 = row0.Y;
+        M02 = row0.Z;
+        M10 = row1.X;
+        M11 = row1.Y;
+        M12 = row1.Z;
+        M20 = row2.X;
+        M21 = row2.Y;
+        M22 = row2.Z;
     }
     
     /// <summary>
-    /// Creates 3x3 matrix
+    /// Creates 3x3 matrix.
     /// <code>
-    ///  m00 | m01 | m02
-    ///  m10 | m11 | m12
-    ///  m20 | m21 | m22
+    ///  m00, m01, m02
+    ///  m10, m11, m12
+    ///  m20, m21, m22
     /// </code>
     /// </summary>
     public Matrix3x3(Matrix3x3 matrix)
@@ -228,37 +257,12 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
         M21 = matrix.M21;
         M22 = matrix.M22;
     }
-
-    public Matrix3x3 Transpose()
-    {
-        return new Matrix3x3(
-            M00, M10, M20,
-            M01, M11, M21,
-            M02, M12, M22
-        );
-    }
-    
-    public float[] ToArray()
-    {
-        return
-        [
-            M00, M10, M20,
-            M01, M11, M21,
-            M02, M12, M22
-        ];
-    }
     
     public bool Equals(Matrix3x3 other)
     {
-        return M00.AboutEquals(other.M00) &&
-               M01.AboutEquals(other.M01) &&
-               M02.AboutEquals(other.M02) &&
-               M10.AboutEquals(other.M10) &&
-               M11.AboutEquals(other.M11) &&
-               M12.AboutEquals(other.M12) &&
-               M20.AboutEquals(other.M20) &&
-               M21.AboutEquals(other.M21) &&
-               M22.AboutEquals(other.M22);
+        return M00.AboutEquals(other.M00) && M01.AboutEquals(other.M01) && M02.AboutEquals(other.M02) &&
+               M10.AboutEquals(other.M10) && M11.AboutEquals(other.M11) && M12.AboutEquals(other.M12) &&
+               M20.AboutEquals(other.M20) && M21.AboutEquals(other.M21) && M22.AboutEquals(other.M22);
     }
     
     [MustDisposeResource]
@@ -287,31 +291,80 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
         yield return M22;
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(
+        out float m00, out float m01, out float m02,
+        out float m10, out float m11, out float m12,
+        out float m20, out float m21, out float m22)
+    {
+        m00 = M00;
+        m01 = M01;
+        m02 = M02;
+        m10 = M10;
+        m11 = M11;
+        m12 = M12;
+        m20 = M20;
+        m21 = M21;
+        m22 = M22;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out Vector3 row0, out Vector3 row1, out Vector3 row2)
+    {
+        row0 = Row0;
+        row1 = Row1;
+        row2 = Row2;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Matrix3x3 Transform(float scale)
+    {
+        return Multiply(this, scale);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3 Transform(Vector3 vector)
+    {
+        return Multiply(this, vector);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Matrix3x3 Transform(Matrix3x3 matrix)
+    {
+        return Multiply(this, matrix);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
         return obj is Matrix3x3 other && Equals(other);
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
-        return HashCode.Combine(Row0, Row1, Row2);
+        return HashCode.Combine(HashCode.Combine(M00, M01, M02, M10, M11), M12, M20, M21, M22);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
-        return $"{M00}, {M01}, {M02}\n{M10}, {M11}, {M12}\n{M20}, {M21}, {M22}";
+        return $"{M00}, {M01}, {M02}, {M10}, {M11}, {M12}, {M20}, {M21}, {M22}";
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Matrix3x3 a, Matrix3x3 b)
     {
         return a.Equals(b);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(Matrix3x3 a, Matrix3x3 b)
     {
         return !a.Equals(b);
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 operator +(Matrix3x3 a, Matrix3x3 b)
     {
         return new Matrix3x3(
@@ -327,16 +380,26 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
         );
     }
 
-    public static Vector3 operator *(Matrix3x3 m, Vector3 v)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x3 operator *(Matrix3x3 m, float s)
     {
-        return new Vector3(
-            m.M00 * v.X + m.M01 * v.Y + m.M02 * v.Z,
-            m.M10 * v.X + m.M11 * v.Y + m.M12 * v.Z,
-            m.M20 * v.X + m.M21 * v.Y + m.M22 * v.Z
-        );
+        return Multiply(m, s);
     }
 
-    public static Matrix3x3 operator *(Matrix3x3 m, float s)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]  
+    public static Vector3 operator *(Matrix3x3 m, Vector3 v)
+    {
+        return Multiply(m, v);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x3 operator *(Matrix3x3 l, Matrix3x3 r)
+    {
+        return Multiply(l, r);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x3 Multiply(Matrix3x3 m, float s)
     {
         return new Matrix3x3(
             m.M00 * s,
@@ -351,33 +414,45 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
         );
     }
 
-    public static Matrix3x3 operator *(Matrix3x3 m, Matrix3x3 b)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 Multiply(Matrix3x3 m, Vector3 v)
+    {
+        return new Vector3(
+            m.M00 * v.X + m.M01 * v.Y + m.M02 * v.Z,
+            m.M10 * v.X + m.M11 * v.Y + m.M12 * v.Z,
+            m.M20 * v.X + m.M21 * v.Y + m.M22 * v.Z
+        );
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x3 Multiply(Matrix3x3 l, Matrix3x3 r)
     {
         return new Matrix3x3(
-            m.M00 * b.M00 + m.M01 * b.M10 + m.M02 * b.M20,
-            m.M00 * b.M01 + m.M01 * b.M11 + m.M02 * b.M21,
-            m.M00 * b.M02 + m.M01 * b.M12 + m.M02 * b.M22,
-            m.M10 * b.M00 + m.M11 * b.M10 + m.M12 * b.M20,
-            m.M10 * b.M01 + m.M11 * b.M11 + m.M12 * b.M21,
-            m.M10 * b.M02 + m.M11 * b.M12 + m.M12 * b.M22,
-            m.M20 * b.M00 + m.M21 * b.M10 + m.M22 * b.M20,
-            m.M20 * b.M01 + m.M21 * b.M11 + m.M22 * b.M21,
-            m.M20 * b.M02 + m.M21 * b.M12 + m.M22 * b.M22
+            l.M00 * r.M00 + l.M01 * r.M10 + l.M02 * r.M20,
+            l.M00 * r.M01 + l.M01 * r.M11 + l.M02 * r.M21,
+            l.M00 * r.M02 + l.M01 * r.M12 + l.M02 * r.M22,
+            l.M10 * r.M00 + l.M11 * r.M10 + l.M12 * r.M20,
+            l.M10 * r.M01 + l.M11 * r.M11 + l.M12 * r.M21,
+            l.M10 * r.M02 + l.M11 * r.M12 + l.M12 * r.M22,
+            l.M20 * r.M00 + l.M21 * r.M10 + l.M22 * r.M20,
+            l.M20 * r.M01 + l.M21 * r.M11 + l.M22 * r.M21,
+            l.M20 * r.M02 + l.M21 * r.M12 + l.M22 * r.M22
         );
     }
     
     /// <summary>
-    /// Creating scaled transform matrix
+    /// Creating transform matrix.
     /// <code>
-    /// cos * scale.X | -sin * scale.Y |  x
-    /// sin * scale.X |  cos * scale.Y |  y
-    ///       0       |       0        |  1
+    /// cos * s, -sin * s,  x
+    /// sin * s,  cos * s,  y
+    ///    0   ,     0   ,  1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateTransform(Vector2 position, Angle angle, Vector2 scale)
     {
-        var sin = (float) Math.Sin(angle.Theta);
-        var cos = (float) Math.Cos(angle.Theta);
+        var sin = (float) double.Sin(angle.Theta);
+        var cos = (float) double.Cos(angle.Theta);
         return new Matrix3x3(
             cos * scale.X, -sin * scale.Y, position.X,
             sin * scale.X,  cos * scale.Y, position.Y,
@@ -386,17 +461,18 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
     
     /// <summary>
-    /// Creating transform matrix
+    /// Creating transform matrix.
     /// <code>
-    /// cos | -sin |  x
-    /// sin |  cos |  y
-    ///  0  |   0  |  1
+    /// cos, -sin,  x
+    /// sin,  cos,  y
+    ///  0 ,   0 ,  1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateTransform(Vector2 position, Angle angle)
     {
-        var sin = (float) Math.Sin(angle.Theta);
-        var cos = (float) Math.Cos(angle.Theta);
+        var sin = (float) double.Sin(angle.Theta);
+        var cos = (float) double.Cos(angle.Theta);
         return new Matrix3x3(
             cos, -sin, position.X,
             sin,  cos, position.Y,
@@ -405,13 +481,14 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
     
     /// <summary>
-    /// Creating scale matrix
+    /// Creating scale matrix.
     /// <code>
-    /// value |   0   |   0 
-    ///   0   | value |   0
-    ///   0   |   0   |   1
+    /// v, 0, 0 
+    /// 0, v, 0
+    /// 0, 0, 1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateScale(float value)
     {
         return new Matrix3x3(
@@ -422,13 +499,14 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
     
     /// <summary>
-    /// Creating scale matrix
+    /// Creating scale matrix.
     /// <code>
-    /// x | 0 | 0 
-    /// 0 | y | 0
-    /// 0 | 0 | 1
+    /// x, 0, 0 
+    /// 0, y, 0
+    /// 0, 0, 1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateScale(Vector2 scale)
     {
         return new Matrix3x3(
@@ -439,13 +517,14 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
 
     /// <summary>
-    /// Creating scale matrix
+    /// Creating scale matrix.
     /// <code>
-    /// x | 0 | 0 
-    /// 0 | y | 0
-    /// 0 | 0 | 1
+    /// x, 0, 0 
+    /// 0, y, 0
+    /// 0, 0, 1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateScale(float x, float y)
     {
         return new Matrix3x3(
@@ -456,30 +535,32 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
     
     /// <summary>
-    /// Creating rotation matrix
+    /// Creating rotation matrix.
     /// <code>
-    /// cos | -sin |  0
-    /// sin |  cos |  0
-    ///  0  |   0  |  1
+    /// cos, -sin,  0
+    /// sin,  cos,  0
+    ///  0 ,   0 ,  1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateRotation(Angle angle)
     {
         return CreateRotation(angle.Theta);
     }
 
     /// <summary>
-    /// Creating rotation matrix
+    /// Creating rotation matrix.
     /// <code>
-    /// cos | -sin |  0
-    /// sin |  cos |  0
-    ///  0  |   0  |  1
+    /// cos, -sin,  0
+    /// sin,  cos,  0
+    ///  0 ,   0 ,  1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateRotation(double angle)
     {
-        var cos = (float) Math.Cos(angle);
-        var sin = (float) Math.Sin(angle);
+        var cos = (float) double.Cos(angle);
+        var sin = (float) double.Sin(angle);
         return new Matrix3x3(
             cos, -sin, 0,
             sin, cos, 0,
@@ -488,30 +569,28 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
 
     /// <summary>
-    /// Creating translation matrix
+    /// Creating translation matrix.
     /// <code>
-    /// 1 | 0 | x 
-    /// 0 | 1 | y
-    /// 0 | 0 | 1
+    /// 1, 0, x 
+    /// 0, 1, y
+    /// 0, 0, 1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateTranslation(Vector2 position)
     {
-        return new Matrix3x3(
-            1, 0, position.X,
-            0, 1, position.Y,
-            0, 0, 1
-        );
+        return CreateTranslation(position.X, position.Y);
     }
 
     /// <summary>
-    /// Creating translation matrix
+    /// Creating translation matrix.
     /// <code>
-    /// 1 | 0 | x 
-    /// 0 | 1 | y
-    /// 0 | 0 | 1
+    /// 1, 0, x 
+    /// 0, 1, y
+    /// 0, 0, 1
     /// </code>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateTranslation(float x, float y)
     {
         return new Matrix3x3(
