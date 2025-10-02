@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -14,6 +15,7 @@ namespace Hypercube.Mathematics.Matrices;
 /// Implementation of a 4x4 matrix for rendering work. (COLUM-MAJOR)
 /// </summary>
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
+[DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Vector4>, IEnumerable<float>
 {

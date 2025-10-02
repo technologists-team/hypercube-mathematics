@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -9,6 +10,7 @@ using JetBrains.Annotations;
 namespace Hypercube.Mathematics.Matrices;
 
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
+[DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, IEnumerable<float>
 {
