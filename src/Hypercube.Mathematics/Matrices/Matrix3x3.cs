@@ -329,6 +329,12 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Matrix3x2 Transform(Matrix3x2 matrix)
+    {
+        return Multiply(this, matrix);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix3x3 Transform(Matrix3x3 matrix)
     {
         return Multiply(this, matrix);
@@ -379,7 +385,39 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
             a.M22 + b.M22
         );
     }
-
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x3 operator -(Matrix3x3 a)
+    {
+        return new Matrix3x3(
+            -a.M00,
+            -a.M01,
+            -a.M02,
+            -a.M10,
+            -a.M11,
+            -a.M12,
+            -a.M20,
+            -a.M21,
+            -a.M22
+        );
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x3 operator -(Matrix3x3 a, Matrix3x3 b)
+    {
+        return new Matrix3x3(
+            a.M00 - b.M00,
+            a.M01 - b.M01,
+            a.M02 - b.M02,
+            a.M10 - b.M10,
+            a.M11 - b.M11,
+            a.M12 - b.M12,
+            a.M20 - b.M20,
+            a.M21 - b.M21,
+            a.M22 - b.M22
+        );
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 operator *(Matrix3x3 m, float s)
     {
@@ -390,6 +428,12 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     public static Vector3 operator *(Matrix3x3 m, Vector3 v)
     {
         return Multiply(m, v);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x2 operator *(Matrix3x3 l, Matrix3x2 r)
+    {
+        return Multiply(l, r);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -424,6 +468,19 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
         );
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x2 Multiply(Matrix3x3 l, Matrix3x2 r)
+    {    
+        return new Matrix3x2(
+            l.M00 * r.M00 + l.M01 * r.M10 + l.M02 * r.M20,
+            l.M00 * r.M01 + l.M01 * r.M11 + l.M02 * r.M21,
+            l.M10 * r.M00 + l.M11 * r.M10 + l.M12 * r.M20,
+            l.M10 * r.M01 + l.M11 * r.M11 + l.M12 * r.M21,
+            l.M20 * r.M00 + l.M21 * r.M10 + l.M22 * r.M20,
+            l.M20 * r.M01 + l.M21 * r.M11 + l.M22 * r.M21
+        );
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 Multiply(Matrix3x3 l, Matrix3x3 r)
     {
