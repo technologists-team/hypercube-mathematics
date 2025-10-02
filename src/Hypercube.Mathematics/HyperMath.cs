@@ -88,23 +88,28 @@ public static class HyperMath
     /// </summary>
     public const float DegreesToRadiansF = PIf / 180;
 
+    /// <summary>
+    /// </summary>
     public const float FloatTolerance = 1e-15f;
+    
+    /// <summary>
+    /// </summary>
     public const double DoubleTolerance = 1e-15d;
     
     /// <summary>
     /// Determines whether two floating-point values are approximately equal, within a specified tolerance.
     /// </summary>
-    public static bool AboutEquals(float a, float b, float tolerance = FloatTolerance)
+    public static bool AboutEquals(float l, float r, float tolerance = FloatTolerance)
     {
-        return float.Abs(a - b) <= float.Max(float.Abs(a), float.Abs(b)) * tolerance;
+        return float.Abs(l - r) <= float.Max(float.Abs(l), float.Abs(r)) * tolerance;
     }
 
     /// <summary>
     /// Determines whether two double-precision values are approximately equal, within a specified tolerance.
     /// </summary>
-    public static bool AboutEquals(double a, double b, double tolerance = DoubleTolerance)
+    public static bool AboutEquals(double l, double r, double tolerance = DoubleTolerance)
     {
-        return double.Abs(a - b) <= double.Max(double.Abs(a), double.Abs(b)) * tolerance;
+        return double.Abs(l - r) <= double.Max(double.Abs(l), double.Abs(r)) * tolerance;
     }
 
     /// <summary>

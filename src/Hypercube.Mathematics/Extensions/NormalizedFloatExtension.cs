@@ -1,7 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Extensions;
 
+[PublicAPI]
 public static class NormalizedFloatExtension
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

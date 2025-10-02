@@ -1,17 +1,20 @@
-﻿using JetBrains.Annotations;
+﻿using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Extensions;
 
 [PublicAPI]
 public static class FloatingPointEqualsExtension
 {
-    public static bool AboutEquals(this float a, float b, float tolerance = 1E-15f)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool AboutEquals(this float @this, float value, float tolerance = 1E-15f)
     {
-        return HyperMath.AboutEquals(a, b, tolerance);
+        return HyperMath.AboutEquals(@this, value, tolerance);
     }
 
-    public static bool AboutEquals(this double a, double b, double tolerance = 1E-15d)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool AboutEquals(this double @this, double value, double tolerance = 1E-15d)
     {
-        return HyperMath.AboutEquals(a, b, tolerance);
+        return HyperMath.AboutEquals(@this, value, tolerance);
     }
 }
