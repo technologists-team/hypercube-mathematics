@@ -1,17 +1,19 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Hypercube.Mathematics.Extensions;
-using Hypercube.Mathematics.Vectors;
 using JetBrains.Annotations;
+using Vector2 = Hypercube.Mathematics.Vectors.Vector2;
+using Vector3 = Hypercube.Mathematics.Vectors.Vector3;
 
 namespace Hypercube.Mathematics.Matrices;
 
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>
+public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>, IEnumerable<Vector2>, IEnumerable<float>
 {
     /// <value>
     /// <code>
@@ -168,6 +170,29 @@ public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>
                M20.AboutEquals(other.M20) && M21.AboutEquals(other.M21);
     }
 
+    [MustDisposeResource]
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return ((IEnumerable<float>) this).GetEnumerator();
+    }
+    
+    IEnumerator<Vector2> IEnumerable<Vector2>.GetEnumerator()
+    {
+        yield return Row0;
+        yield return Row1;
+        yield return Row2;
+    }
+
+    IEnumerator<float> IEnumerable<float>.GetEnumerator()
+    {
+        yield return M00;
+        yield return M01;
+        yield return M10;
+        yield return M11;
+        yield return M20;
+        yield return M21;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
@@ -185,7 +210,7 @@ public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>
     {
         return $"{M00}, {M01}, {M10}, {M11}, {M20}, {M21}";
     }
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Matrix3x2 a, Matrix3x2 b)
     {
