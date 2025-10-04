@@ -10,7 +10,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>assets/logo.png</PackageIcon>
         
-        <Version>1.0.5</Version>
+        <Version>1.1.0</Version>
         <Authors>TornadoTech</Authors>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <RepositoryUrl>https://github.com/technologists-team/hypercube-mathematics</RepositoryUrl>
