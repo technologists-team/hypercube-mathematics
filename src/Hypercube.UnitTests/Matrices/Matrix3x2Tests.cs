@@ -81,8 +81,8 @@ public sealed class Matrix3x2Tests
         {
             Assert.That(matrix.M00, Is.EqualTo(2f));
             Assert.That(matrix.M01, Is.EqualTo(0f));
-            Assert.That(matrix.M10, Is.EqualTo(3f));
-            Assert.That(matrix.M11, Is.EqualTo(0f));
+            Assert.That(matrix.M10, Is.EqualTo(0f));
+            Assert.That(matrix.M11, Is.EqualTo(3f));
             Assert.That(matrix.M20, Is.EqualTo(0f));
             Assert.That(matrix.M21, Is.EqualTo(0f));
         });
