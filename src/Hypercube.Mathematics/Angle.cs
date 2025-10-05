@@ -7,8 +7,9 @@ using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics;
 
-[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential), DebuggerDisplay("{Theta} ({Degrees})")]
-public readonly struct Angle : IEquatable<Angle>, IEquatable<double>
+[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
+[DebuggerDisplay("{Theta} ({Degrees})")]
+public readonly struct Angle : IEquatable<Angle>, IEquatable<double>, IComparable<Angle>, IComparable<double>
 {
     public static readonly Angle Zero = new(0);
     
@@ -23,7 +24,7 @@ public readonly struct Angle : IEquatable<Angle>, IEquatable<double>
     public Vector2 Vector
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(MathF.Cos((float) Theta), MathF.Sin((float) Theta));
+        get => new(double.Cos(Theta), double.Sin(Theta));
     }
 
     public Angle(double theta)
@@ -46,6 +47,18 @@ public readonly struct Angle : IEquatable<Angle>, IEquatable<double>
     public bool Equals(double other)
     {
         return Theta.AboutEquals(other);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int CompareTo(Angle other)
+    {
+        return Theta.CompareTo(other.Theta);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int CompareTo(double other)
+    {
+        return Theta.CompareTo(other);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -89,6 +102,54 @@ public readonly struct Angle : IEquatable<Angle>, IEquatable<double>
     public static bool operator !=(Angle a, Angle b)
     {
         return !a.Equals(b);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator <(Angle left, Angle right)
+    {
+        return left.CompareTo(right) == -1;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator >(Angle left, Angle right)
+    {
+        return left.CompareTo(right) == 1;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator <=(Angle left, Angle right)
+    {
+        return left.CompareTo(right) is -1 or 0;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator >=(Angle left, Angle right)
+    {
+        return left.CompareTo(right) is 1 or 0;
+    }
+        
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator <(Angle left, double right)
+    {
+        return left.CompareTo(right) == -1;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator >(Angle left, double right)
+    {
+        return left.CompareTo(right) == 1;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator <=(Angle left, double right)
+    {
+        return left.CompareTo(right) is -1 or 0;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator >=(Angle left, double right)
+    {
+        return left.CompareTo(right) is 1 or 0;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
