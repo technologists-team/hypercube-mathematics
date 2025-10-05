@@ -1,6 +1,4 @@
-﻿using Hypercube.Mathematics;
-
-namespace Hypercube.Mathematics.UnitTests;
+﻿namespace Hypercube.Mathematics.UnitTests;
 
 [TestFixture]
 public sealed class HyperMathTests
@@ -18,7 +16,7 @@ public sealed class HyperMathTests
     [TestCaseSource(nameof(MoveTowardsCases))]
     public void MoveTowardsReturnsExpectedResult(int current, int target, int distance, int expected)
     {
-        Assert.AreEqual(expected, HyperMath.MoveTowards(current, target, distance));
+        Assert.That(expected, Is.EqualTo(HyperMath.MoveTowards(current, target, distance)));
     }
     
     [Test]
