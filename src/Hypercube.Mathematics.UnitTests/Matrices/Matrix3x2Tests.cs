@@ -12,110 +12,100 @@ public sealed class Matrix3x2Tests
     public void ZeroMatrix_HasAllZeroes()
     {
         var matrix = Matrix3x2.Zero;
-
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
-            Assert.That(matrix.M00, Is.EqualTo(0f));
-            Assert.That(matrix.M01, Is.EqualTo(0f));
-            Assert.That(matrix.M10, Is.EqualTo(0f));
-            Assert.That(matrix.M11, Is.EqualTo(0f));
-            Assert.That(matrix.M20, Is.EqualTo(0f));
-            Assert.That(matrix.M21, Is.EqualTo(0f));
-        });
+            Assert.That(matrix.M00, Is.Zero);
+            Assert.That(matrix.M01, Is.Zero);
+            Assert.That(matrix.M10, Is.Zero);
+            Assert.That(matrix.M11, Is.Zero);
+            Assert.That(matrix.M20, Is.Zero);
+            Assert.That(matrix.M21, Is.Zero);
+        }
     }
 
     [Test]
-    public void OneMatrix_HasAllOnes()
+    public void OneMatrix()
     {
         var matrix = Matrix3x2.One;
-
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
-            Assert.That(matrix.M00, Is.EqualTo(1f));
-            Assert.That(matrix.M01, Is.EqualTo(1f));
-            Assert.That(matrix.M10, Is.EqualTo(1f));
-            Assert.That(matrix.M11, Is.EqualTo(1f));
-            Assert.That(matrix.M20, Is.EqualTo(1f));
-            Assert.That(matrix.M21, Is.EqualTo(1f));
-        });
+            Assert.That(matrix.M00, Is.EqualTo(1));
+            Assert.That(matrix.M01, Is.EqualTo(1));
+            Assert.That(matrix.M10, Is.EqualTo(1));
+            Assert.That(matrix.M11, Is.EqualTo(1));
+            Assert.That(matrix.M20, Is.EqualTo(1));
+            Assert.That(matrix.M21, Is.EqualTo(1));
+        }
     }
 
     [Test]
-    public void IdentityMatrix_HasCorrectValues()
+    public void IdentityMatrix()
     {
         var matrix = Matrix3x2.Identity;
-
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
-            Assert.That(matrix.M00, Is.EqualTo(1f));
-            Assert.That(matrix.M01, Is.EqualTo(0f));
-            Assert.That(matrix.M10, Is.EqualTo(0f));
-            Assert.That(matrix.M11, Is.EqualTo(1f));
-            Assert.That(matrix.M20, Is.EqualTo(0f));
-            Assert.That(matrix.M21, Is.EqualTo(0f));
-        });
+            Assert.That(matrix.M00, Is.EqualTo(1));
+            Assert.That(matrix.M01, Is.Zero);
+            Assert.That(matrix.M10, Is.Zero);
+            Assert.That(matrix.M11, Is.EqualTo(1));
+            Assert.That(matrix.M20, Is.Zero);
+            Assert.That(matrix.M21, Is.Zero);
+        }
     }
 
     [Test]
-    public void CreateTranslation_CorrectMatrix()
+    public void CreateTranslation()
     {
         var matrix = Matrix3x2.CreateTranslation(3, 5);
-
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
-            Assert.That(matrix.M00, Is.EqualTo(1f));
-            Assert.That(matrix.M01, Is.EqualTo(0f));
-            Assert.That(matrix.M10, Is.EqualTo(0f));
-            Assert.That(matrix.M11, Is.EqualTo(1f));
-            Assert.That(matrix.M20, Is.EqualTo(3f));
-            Assert.That(matrix.M21, Is.EqualTo(5f));
-        });
+            Assert.That(matrix.M00, Is.EqualTo(1));
+            Assert.That(matrix.M01, Is.Zero);
+            Assert.That(matrix.M10, Is.Zero);
+            Assert.That(matrix.M11, Is.EqualTo(1));
+            Assert.That(matrix.M20, Is.EqualTo(3));
+            Assert.That(matrix.M21, Is.EqualTo(5));
+        }
     }
 
     [Test]
-    public void CreateScale_CorrectMatrix()
+    public void CreateScale()
     {
         var matrix = Matrix3x2.CreateScale(2, 3);
-
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
-            Assert.That(matrix.M00, Is.EqualTo(2f));
-            Assert.That(matrix.M01, Is.EqualTo(0f));
-            Assert.That(matrix.M10, Is.EqualTo(0f));
-            Assert.That(matrix.M11, Is.EqualTo(3f));
-            Assert.That(matrix.M20, Is.EqualTo(0f));
-            Assert.That(matrix.M21, Is.EqualTo(0f));
-        });
+            Assert.That(matrix.M00, Is.EqualTo(2));
+            Assert.That(matrix.M01, Is.Zero);
+            Assert.That(matrix.M10, Is.Zero);
+            Assert.That(matrix.M11, Is.EqualTo(3));
+            Assert.That(matrix.M20, Is.Zero);
+            Assert.That(matrix.M21, Is.Zero);
+        }
     }
 
     [Test]
-    public void CreateRotation_90Degrees_RotatesCorrectly()
+    public void CreateRotation()
     {
-        var angle = Math.PI / 2;
-        var matrix = Matrix3x2.CreateRotation(angle);
-
-        Assert.Multiple(() =>
+        var matrix = Matrix3x2.CreateRotation(HyperMath.PIOver2);
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(matrix.M00, Is.EqualTo(0f).Within(1e-5));
             Assert.That(matrix.M01, Is.EqualTo(1f).Within(1e-5));
             Assert.That(matrix.M10, Is.EqualTo(-1f).Within(1e-5));
             Assert.That(matrix.M11, Is.EqualTo(0f).Within(1e-5));
-        });
+        }
     }
 
     [Test]
-    public void Transform_AppliesTransformation()
+    public void TransformVector2()
     {
-        var matrix = new Matrix3x2(
-            2, 0,  // scale X
-            0, 3,  // scale Y
-            1, 1   // translation
-        );
+        var result = new Matrix3x2(
+            2, 0, 
+            0, 3, 
+            1, 1
+        ) * Vector2.One;
 
-        var v = new Vector2(1, 1);
-        var result = matrix.Transform(v);
-
-        // Expected: (1*2 + 1*0 + 1, 1*0 + 1*3 + 1) = (3, 4)
+        // Expected: (1 * 2 + 1 * 0 + 1, 1 * 0 + 1 * 3 + 1) = (3, 4)
         Assert.That(result, Is.EqualTo(new Vector2(3, 4)));
     }
 }

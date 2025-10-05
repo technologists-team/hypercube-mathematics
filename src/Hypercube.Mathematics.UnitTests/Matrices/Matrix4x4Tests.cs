@@ -9,65 +9,39 @@ namespace Hypercube.Mathematics.UnitTests.Matrices;
 public sealed class Matrix4x4Tests
 {
     [Test]
-    public void Multiply_IdentityMatrix_VectorEqualsOriginal()
+    public void Multiply_IdentityMatrix()
     {
-        var identity = Matrix4x4.Identity;
-        var vector = new Vector4(1, 2, 3, 4);
-        
-        var result = identity * vector;
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.X, Is.EqualTo(vector.X).Within(1e-5));
-            Assert.That(result.Y, Is.EqualTo(vector.Y).Within(1e-5));
-            Assert.That(result.Z, Is.EqualTo(vector.Z).Within(1e-5));
-            Assert.That(result.W, Is.EqualTo(vector.W).Within(1e-5));
-        });
+        var original = new Vector4(1, 2, 3, 4);
+        var result = Matrix4x4.Identity * original;
+        AssertAreEqual(result, original);
     }
 
     [Test]
-    public void Multiply_TranslationMatrix_VectorTranslated()
+    public void Multiply_TranslationMatrix_Vector4()
     {
-        var translation = new Matrix4x4(
+        var result = new Matrix4x4(
             1, 0, 0, 10,
             0, 1, 0, 20,
             0, 0, 1, 30,
             0, 0, 0, 1
-        );
-        
-        var vector = new Vector4(1, 2, 3, 1);
-        var result = translation * vector;
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.X, Is.EqualTo(11).Within(1e-5));
-            Assert.That(result.Y, Is.EqualTo(22).Within(1e-5));
-            Assert.That(result.Z, Is.EqualTo(33).Within(1e-5));
-            Assert.That(result.W, Is.EqualTo(1).Within(1e-5));
-        });
+        ) * new Vector4(1, 2, 3, 1);
+        AssertAreEqual(result, new Vector4(11, 22, 33, 1));
     }
 
     [Test]
-    public void Multiply_ScalingMatrix_VectorScaled()
+    public void Multiply_ScaleMatrix_Vector4()
     {
-        var scaling = new Matrix4x4(
+        var result = new Matrix4x4(
             2, 0, 0, 0,
             0, 3, 0, 0,
             0, 0, 4, 0,
             0, 0, 0, 1
-        );
-
-        var vector = new Vector4(1, 2, 3, 1);
-        var result = scaling * vector;
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.X, Is.EqualTo(2).Within(1e-5));
-            Assert.That(result.Y, Is.EqualTo(6).Within(1e-5));
-            Assert.That(result.Z, Is.EqualTo(12).Within(1e-5));
-            Assert.That(result.W, Is.EqualTo(1).Within(1e-5));
-        });
+        ) * new Vector4(1, 2, 3, 1);
+        AssertAreEqual(result, new Vector4(2, 6, 12, 1));
     }
     
     [Test]
-    public void Addition_AddTwoMatrices_ReturnsCorrectResult()
+    public void Addition_AddTwoMatrices()
     {
         var a = new Matrix4x4(
             1, 2, 3, 4,
@@ -91,31 +65,32 @@ public sealed class Matrix4x4Tests
         );
 
         var result = a + b;
-        AssertMatricesAreEqual(expected, result);
+        AssertAreEqual(expected, result);
     }
 
     [Test]
-    public void Multiply_Scalar_ReturnsScaledMatrix()
+    public void Multiply_Scalar()
     {
         var a = new Matrix4x4(
             1, 2, 3, 4,
             5, 6, 7, 8,
             9, 10, 11, 12,
-            13, 14, 15, 16);
-
-        const float scalar = 2f;
+            13, 14, 15, 16
+        );
+        
         var expected = new Matrix4x4(
             2, 4, 6, 8,
             10, 12, 14, 16,
             18, 20, 22, 24,
-            26, 28, 30, 32);
+            26, 28, 30, 32
+        );
 
-        var result = a * scalar;
-        AssertMatricesAreEqual(expected, result);
+        var result = a * 2;
+        AssertAreEqual(expected, result);
     }
 
     [Test]
-    public void Multiply_Matrix_ReturnsCorrectResult()
+    public void Multiply_Matrix4x4()
     {
         var a = new Matrix4x4(
             1, 2, 3, 4,
@@ -137,63 +112,68 @@ public sealed class Matrix4x4Tests
         );
 
         var result = a * b;
-        AssertMatricesAreEqual(expected, result);
+        AssertAreEqual(expected, result);
     }
 
     [Test]
-    public void Equals_SameValues_ReturnsTrue()
+    public void Equals_SameValues()
     {
         var a = new Matrix4x4(
             1, 2, 3, 4,
             5, 6, 7, 8,
             9, 10, 11, 12,
-            13, 14, 15, 16);
+            13, 14, 15, 16
+        );
 
         var b = new Matrix4x4(
             1, 2, 3, 4,
             5, 6, 7, 8,
             9, 10, 11, 12,
-            13, 14, 15, 16);
+            13, 14, 15, 16
+        );
 
         Assert.That(a, Is.EqualTo(b));
     }
 
     [Test]
-    public void Equals_DifferentValues_ReturnsFalse()
+    public void Equals_DifferentValues()
     {
         var a = new Matrix4x4(
             1, 2, 3, 4,
             5, 6, 7, 8,
             9, 10, 11, 12,
-            13, 14, 15, 16);
+            13, 14, 15, 16
+        );
 
         var b = new Matrix4x4(
             1, 2, 3, 4,
             5, 6, 7, 8,
             9, 10, 11, 12,
-            13, 14, 15, 17);
+            13, 14, 15, 17
+        );
         
         Assert.That(a, Is.Not.EqualTo(b));
     }
 
     [Test]
-    public void Multiply_Vector4_ReturnsCorrectResult()
+    public void Multiply_Vector4()
     {
+        var expected = new Vector4(11, 22, 33, 1);
+        var v = new Vector4(1, 2, 3, 1);
         var m = new Matrix4x4(
             1, 0, 0, 10,
             0, 1, 0, 20,
             0, 0, 1, 30,
-            0, 0, 0, 1);
+            0, 0, 0, 1
+        );
 
-        var v = new Vector4(1, 2, 3, 1);
-        var expected = new Vector4(11, 22, 33, 1);
         var result = m * v;
-        AssertVectorsAreEqual(expected, result);
+        AssertAreEqual(expected, result);
     }
     
-    private static void AssertMatricesAreEqual(Matrix4x4 expected, Matrix4x4 actual, float delta = 1e-5f)
+    private static void AssertAreEqual(Matrix4x4 expected, Matrix4x4 actual, float delta = HyperMath.FloatTolerance)
     {
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual.M00, Is.EqualTo(expected.M00).Within(delta));
             Assert.That(actual.M01, Is.EqualTo(expected.M01).Within(delta));
@@ -211,17 +191,17 @@ public sealed class Matrix4x4Tests
             Assert.That(actual.M31, Is.EqualTo(expected.M31).Within(delta));
             Assert.That(actual.M32, Is.EqualTo(expected.M32).Within(delta));
             Assert.That(actual.M33, Is.EqualTo(expected.M33).Within(delta));
-        });
+        }
     }
     
-    private static void AssertVectorsAreEqual(Vector4 expected, Vector4 actual, float delta = 1e-5f)
+    private static void AssertAreEqual(Vector4 expected, Vector4 actual, float delta = HyperMath.FloatTolerance)
     {
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual.X, Is.EqualTo(expected.X).Within(delta));
             Assert.That(actual.Y, Is.EqualTo(expected.Y).Within(delta));
             Assert.That(actual.Z, Is.EqualTo(expected.Z).Within(delta));
             Assert.That(actual.W, Is.EqualTo(expected.W).Within(delta));
-        });
+        }
     }
 }

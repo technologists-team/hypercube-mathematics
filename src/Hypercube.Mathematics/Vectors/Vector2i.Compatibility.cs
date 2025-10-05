@@ -37,7 +37,7 @@ public readonly partial struct Vector2i
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector4(Vector2i vector)
     {
-        return new Vector4(vector.X, vector.Y, 0f, 0f);
+        return new Vector4(vector.X, vector.Y, 0, 0);
     }
     
     /*

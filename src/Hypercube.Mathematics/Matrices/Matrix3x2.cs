@@ -11,8 +11,8 @@ using Vector3 = Hypercube.Mathematics.Vectors.Vector3;
 namespace Hypercube.Mathematics.Matrices;
 
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
-[DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[DebuggerDisplay("{ToString()}")]
 public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>, IEnumerable<Vector2>, IEnumerable<float>
 {
     /// <value>
@@ -149,19 +149,7 @@ public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>, IEnumerable<Ve
         row1 = Row1;
         row2 = Row2;
     }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix3x2 Transform(Matrix3x2 matrix)
-    {
-        return Multiply(this, matrix);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2 Transform(Vector2 vector)
-    {
-        return Multiply(this, vector);
-    }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Matrix3x2 other)
     {
@@ -226,27 +214,6 @@ public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>, IEnumerable<Ve
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x2 operator *(Matrix3x2 a, Matrix3x2 b)
     {
-        return Multiply(a, b);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator *(Matrix3x2 a, Vector2 b)
-    {
-        return Multiply(a, b);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Multiply(Matrix3x2 a, Vector2 b)
-    {
-        return new Vector2(
-            b.X * a.M00 + b.Y * a.M10 + a.M20,
-            b.X * a.M01 + b.Y * a.M11 + a.M21
-        );
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix3x2 Multiply(Matrix3x2 a, Matrix3x2 b)
-    {
         return new Matrix3x2(
             a.M00 * b.M00 + a.M01 * b.M10,
             a.M00 * b.M01 + a.M01 * b.M11,
@@ -254,6 +221,15 @@ public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>, IEnumerable<Ve
             a.M10 * b.M01 + a.M11 * b.M11,
             a.M20 * b.M00 + a.M21 * b.M10 + b.M20,
             a.M20 * b.M01 + a.M21 * b.M11 + b.M21
+        );
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 operator *(Matrix3x2 a, Vector2 b)
+    {
+        return new Vector2(
+            b.X * a.M00 + b.Y * a.M10 + a.M20,
+            b.X * a.M01 + b.Y * a.M11 + a.M21
         );
     }
     

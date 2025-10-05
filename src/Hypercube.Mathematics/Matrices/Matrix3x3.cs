@@ -9,9 +9,12 @@ using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Matrices;
 
+/// <summary>
+/// Implementation of a 4x4 matrix for rendering work. (COLUM-MAJOR)
+/// </summary>
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
-[DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[DebuggerDisplay("{ToString()}")]
 public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, IEnumerable<float>
 {
     /// <value>
@@ -319,30 +322,6 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix3x3 Transform(float scale)
-    {
-        return Multiply(this, scale);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Transform(Vector3 vector)
-    {
-        return Multiply(this, vector);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix3x2 Transform(Matrix3x2 matrix)
-    {
-        return Multiply(this, matrix);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix3x3 Transform(Matrix3x3 matrix)
-    {
-        return Multiply(this, matrix);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
         return obj is Matrix3x3 other && Equals(other);
@@ -423,30 +402,6 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 operator *(Matrix3x3 m, float s)
     {
-        return Multiply(m, s);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]  
-    public static Vector3 operator *(Matrix3x3 m, Vector3 v)
-    {
-        return Multiply(m, v);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix3x2 operator *(Matrix3x3 l, Matrix3x2 r)
-    {
-        return Multiply(l, r);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix3x3 operator *(Matrix3x3 l, Matrix3x3 r)
-    {
-        return Multiply(l, r);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix3x3 Multiply(Matrix3x3 m, float s)
-    {
         return new Matrix3x3(
             m.M00 * s,
             m.M01 * s,
@@ -460,8 +415,8 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
         );
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Multiply(Matrix3x3 m, Vector3 v)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]  
+    public static Vector3 operator *(Matrix3x3 m, Vector3 v)
     {
         return new Vector3(
             m.M00 * v.X + m.M01 * v.Y + m.M02 * v.Z,
@@ -469,10 +424,10 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
             m.M20 * v.X + m.M21 * v.Y + m.M22 * v.Z
         );
     }
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix3x2 Multiply(Matrix3x3 l, Matrix3x2 r)
-    {    
+    public static Matrix3x2 operator *(Matrix3x3 l, Matrix3x2 r)
+    {
         return new Matrix3x2(
             l.M00 * r.M00 + l.M01 * r.M10 + l.M02 * r.M20,
             l.M00 * r.M01 + l.M01 * r.M11 + l.M02 * r.M21,
@@ -484,7 +439,7 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix3x3 Multiply(Matrix3x3 l, Matrix3x3 r)
+    public static Matrix3x3 operator *(Matrix3x3 l, Matrix3x3 r)
     {
         return new Matrix3x3(
             l.M00 * r.M00 + l.M01 * r.M10 + l.M02 * r.M20,
@@ -498,7 +453,9 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
             l.M20 * r.M02 + l.M21 * r.M12 + l.M22 * r.M22
         );
     }
-    
+
+    #region Transform
+
     /// <summary>
     /// Creating transform matrix.
     /// <code>
@@ -538,7 +495,11 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
             0, 0, 1
         );
     }
-    
+
+    #endregion
+
+    #region Scale
+
     /// <summary>
     /// Creating scale matrix.
     /// <code>
@@ -592,7 +553,11 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
             0, 0, 1
         );
     }
-    
+
+    #endregion
+
+    #region Rotation
+
     /// <summary>
     /// Creating rotation matrix.
     /// <code>
@@ -627,35 +592,46 @@ public partial struct Matrix3x3 : IEquatable<Matrix3x3>, IEnumerable<Vector3>, I
         );
     }
 
-    /// <summary>
-    /// Creating translation matrix.
-    /// <code>
-    /// 1, 0, x 
-    /// 0, 1, y
-    /// 0, 0, 1
-    /// </code>
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix3x3 CreateTranslation(Vector2 position)
-    {
-        return CreateTranslation(position.X, position.Y);
-    }
+    #endregion
+
+    #region Translation
 
     /// <summary>
-    /// Creating translation matrix.
+    /// Creating translate matrix. (column-major)
     /// <code>
-    /// 1, 0, x 
-    /// 0, 1, y
-    /// 0, 0, 1
+    /// 1, 0, 0 
+    /// 0, 1, 0
+    /// x, y, 1
     /// </code>
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix3x3 CreateTranslation(float x, float y)
     {
         return new Matrix3x3(
-            1, 0, x,
-            0, 1, y,
-            0, 0, 1
+            1, 0, 0,
+            0, 1, 0,
+            x, y, 1
         );
     }
+
+    /// <summary>
+    /// Creating translate matrix. (column-major)
+    /// <code>
+    /// 1, 0, 0 
+    /// 0, 1, 0
+    /// x, y, 1
+    /// </code>
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix3x3 CreateTranslation(Vector2 position)
+    {
+        return new Matrix3x3(
+            1, 0, 0,
+            0, 1, 0,
+            position.X, position.Y, 1
+        );
+    }
+
+    #endregion
+    
 }

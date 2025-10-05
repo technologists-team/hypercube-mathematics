@@ -15,36 +15,61 @@ namespace Hypercube.Mathematics.Matrices;
 /// Implementation of a 4x4 matrix for rendering work. (COLUM-MAJOR)
 /// </summary>
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
-[DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[DebuggerDisplay("{ToString()}")]
 public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Vector4>, IEnumerable<float>
 {
-    /// <summary>
+    /// <value>
     /// <code>
-    /// 0 | 0 | 0 | 0
-    /// 0 | 0 | 0 | 0
-    /// 0 | 0 | 0 | 0
-    /// 0 | 0 | 0 | 0
+    /// NaN, NaN, NaN, NaN
+    /// NaN, NaN, NaN, NaN
+    /// NaN, NaN, NaN, NaN
+    /// NaN, NaN, NaN, NaN
     /// </code>
-    /// </summary>
-    public static readonly Matrix4x4 Zero = new(0);
+    /// </value>
+    public static readonly Matrix4x4 NaN = new(
+        float.NaN, float.NaN, float.NaN, float.NaN,
+        float.NaN, float.NaN, float.NaN, float.NaN,
+        float.NaN, float.NaN, float.NaN, float.NaN,
+        float.NaN, float.NaN, float.NaN, float.NaN
+    );
     
     /// <summary>
     /// <code>
-    /// 1 | 1 | 1 | 1
-    /// 1 | 1 | 1 | 1
-    /// 1 | 1 | 1 | 1
-    /// 1 | 1 | 1 | 1
+    /// 0, 0, 0, 0
+    /// 0, 0, 0, 0
+    /// 0, 0, 0, 0
+    /// 0, 0, 0, 0
     /// </code>
     /// </summary>
-    public static readonly Matrix4x4 One = new(1);
+    public static readonly Matrix4x4 Zero = new(
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0
+    );
     
     /// <summary>
     /// <code>
-    /// 1 | 0 | 0 | 0
-    /// 0 | 1 | 0 | 0
-    /// 0 | 0 | 1 | 0
-    /// 0 | 0 | 0 | 1
+    /// 1, 1, 1, 1
+    /// 1, 1, 1, 1
+    /// 1, 1, 1, 1
+    /// 1, 1, 1, 1
+    /// </code>
+    /// </summary>
+    public static readonly Matrix4x4 One = new(
+        1, 1, 1, 1,
+        1, 1, 1, 1,
+        1, 1, 1, 1,
+        1, 1, 1, 1
+    );
+    
+    /// <summary>
+    /// <code>
+    /// 1, 0, 0, 0
+    /// 0, 1, 0, 0
+    /// 0, 0, 1, 0
+    /// 0, 0, 0, 1
     /// </code>
     /// </summary>
     public static readonly Matrix4x4 Identity = new(
@@ -54,15 +79,54 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         0, 0, 0, 1
     );
 
-    public Vector4 Row0 => new(M00, M01, M02, M03);
-    public Vector4 Row1 => new(M10, M11, M12, M13);
-    public Vector4 Row2 => new(M20, M21, M22, M23);
-    public Vector4 Row3 => new(M30, M31, M32, M33);
-    public Vector4 Column0 => new(M00, M10, M20, M30);
-    public Vector4 Column1 => new(M01, M11, M21, M31);
-    public Vector4 Column2 => new(M02, M12, M22, M32);
-    public Vector4 Column3 => new(M03, M13, M23, M33);
-    
+    public Vector4 Row0
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M00, M01, M02, M03);
+    }
+
+    public Vector4 Row1
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M10, M11, M12, M13);
+    }
+
+    public Vector4 Row2
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M20, M21, M22, M23);
+    }
+
+    public Vector4 Row3
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M30, M31, M32, M33);
+    }
+
+    public Vector4 Column0
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M00, M10, M20, M30);
+    }
+
+    public Vector4 Column1
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M01, M11, M21, M31);
+    }
+
+    public Vector4 Column2
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M02, M12, M22, M32);
+    }
+
+    public Vector4 Column3
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(M03, M13, M23, M33);
+    }
+
     /// <summary>
     /// Matrix x: 0, y: 0 element.
     /// </summary>
@@ -143,81 +207,73 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     /// </summary>
     public readonly float M33;
 
-    public float this[int x, int y] =>
-        y switch
-        {
-            0 => x switch
-            {
-                0 => M00,
-                1 => M01,
-                2 => M02,
-                3 => M03,
-                _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
-            },
-            1 => x switch
-            {
-                0 => M10,
-                1 => M11,
-                2 => M12,
-                3 => M13,
-                _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
-            },
-            2 => x switch
-            {
-                0 => M20,
-                1 => M21,
-                2 => M22,
-                3 => M23,
-                _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
-            },
-            3 => x switch
-            {
-                0 => M30,
-                1 => M31,
-                2 => M32,
-                3 => M33,
-                _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(y), y, null)
-        };
-    
-    /// <summary>
-    /// Creates new matrix with all rows is "<paramref name="value"/>"
-    /// <code>
-    /// value | value | value | value 
-    /// value | value | value | value
-    /// value | value | value | value 
-    /// value | value | value | value 
-    /// </code>
-    /// </summary>
-    /// <param name="value">Vector4 to make rows out of</param>
-    public Matrix4x4(float value)
+    public Matrix4x4 Transposed
     {
-        M00 = value;
-        M01 = value;
-        M02 = value;
-        M03 = value;
-        M10 = value;
-        M11 = value;
-        M12 = value;
-        M13 = value;
-        M20 = value;
-        M21 = value;
-        M22 = value;
-        M23 = value;
-        M30 = value;
-        M31 = value;
-        M32 = value;
-        M33 = value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(
+            M00, M10, M20, M30,
+            M01, M11, M21, M31,
+            M02, M12, M22, M32,
+            M03, M13, M23, M33
+        );
     }
     
+    public float[] Array
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => [
+            M00, M10, M20, M30,
+            M01, M11, M21, M31,
+            M02, M12, M22, M32,
+            M03, M13, M23, M33
+        ];
+    }
+
+    
+    public float this[int x, int y] => y switch
+    {
+        0 => x switch
+        {
+            0 => M00,
+            1 => M01,
+            2 => M02,
+            3 => M03,
+            _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
+        },
+        1 => x switch
+        {
+            0 => M10,
+            1 => M11,
+            2 => M12,
+            3 => M13,
+            _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
+        },
+        2 => x switch
+        {
+            0 => M20,
+            1 => M21,
+            2 => M22,
+            3 => M23,
+            _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
+        },
+        3 => x switch
+        {
+            0 => M30,
+            1 => M31,
+            2 => M32,
+            3 => M33,
+            _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
+        },
+        _ => throw new ArgumentOutOfRangeException(nameof(y), y, null)
+    };
+
     /// <summary>
-    /// Creating matrix
+    /// Creates 4x4 matrix.
     /// <code>
-    /// m00 | m01 | m02 | m03 
-    /// m10 | m11 | m12 | m13
-    /// m20 | m21 | m22 | m23
-    /// m30 | m31 | m32 | m33
+    /// m00, m01, m02, m03 
+    /// m10, m11, m12, m13
+    /// m20, m21, m22, m23
+    /// m30, m31, m32, m33
     /// </code>
     /// </summary>
     public Matrix4x4(
@@ -243,92 +299,58 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         M32 = m32;
         M33 = m33;
     }
-    
-    /// <summary>
-    /// Creates new matrix with all rows is "<paramref name="value"/>"
-    /// <code>
-    /// value.X | value.Y | value.Z | value.W 
-    /// value.X | value.Y | value.Z | value.W 
-    /// value.X | value.Y | value.Z | value.W 
-    /// value.X | value.Y | value.Z | value.W 
-    /// </code>
-    /// </summary>
-    /// <param name="value">Vector4 to make rows out of</param>
-    public Matrix4x4(Vector4 value)
-    {
-        M00 = value.X;
-        M01 = value.Y;
-        M02 = value.Z;
-        M03 = value.W;
-        M10 = value.X;
-        M11 = value.Y;
-        M12 = value.Z;
-        M13 = value.W;
-        M20 = value.X;
-        M21 = value.Y;
-        M22 = value.Z;
-        M23 = value.W;
-        M30 = value.X;
-        M31 = value.Y;
-        M32 = value.Z;
-        M33 = value.W;
-    }
 
     /// <summary>
-    /// Creates new matrix 4x4
+    /// Creates 4x4 matrix.
     /// <code>
-    /// Row0.X | Row0.Y | Row0.Z | Row0.W 
-    /// Row1.X | Row1.Y | Row1.Z | Row1.W 
-    /// Row2.X | Row2.Y | Row2.Z | Row2.W 
-    /// Row2.X | Row2.Y | Row2.Z | Row2.W
+    /// r0X, r0Y, r0Z, r0W 
+    /// r1X, r1Y, r1Z, r1W 
+    /// r2X, r2Y, r2Z, r2W 
+    /// r3X, r3Y, r3Z, r2W
     /// </code>
     /// </summary>
-    /// <param name="x">Row 0</param>
-    /// <param name="y">Row 1</param>
-    /// <param name="z">Row 2</param>
-    /// <param name="w">Row 3</param>
-    public Matrix4x4(Vector4 x, Vector4 y, Vector4 z, Vector4 w)
+    public Matrix4x4(Vector4 row0, Vector4 row1, Vector4 row2, Vector4 row3)
     {
-        M00 = x.X;
-        M01 = x.Y;
-        M02 = x.Z;
-        M03 = x.W;
-        M10 = y.X;
-        M11 = y.Y;
-        M12 = y.Z;
-        M13 = y.W;
-        M20 = z.X;
-        M21 = z.Y;
-        M22 = z.Z;
-        M23 = z.W;
-        M30 = w.X;
-        M31 = w.Y;
-        M32 = w.Z;
-        M33 = w.W;
+        M00 = row0.X;
+        M01 = row0.Y;
+        M02 = row0.Z;
+        M03 = row0.W;
+        M10 = row1.X;
+        M11 = row1.Y;
+        M12 = row1.Z;
+        M13 = row1.W;
+        M20 = row2.X;
+        M21 = row2.Y;
+        M22 = row2.Z;
+        M23 = row2.W;
+        M30 = row3.X;
+        M31 = row3.Y;
+        M32 = row3.Z;
+        M33 = row3.W;
     }
     
     /// <summary>
-    /// Creating matrix
+    /// Creates 4x4 matrix.
     /// <code>
-    ///  m00 | m01 | m02 |  0
-    ///  m10 | m11 | m12 |  0
-    ///  m20 | m21 | m22 |  0
-    ///   0  |  0  |  0  |  0
+    ///  m00, m01, m02, 0
+    ///  m10, m11, m12, 0
+    ///  m20, m21, m22, 0
+    ///   0 ,  0 ,  0 , 0
     /// </code>
     /// </summary>
     public Matrix4x4(Matrix3x3 matrix)
     {
-        M00 = matrix.Row0.X;
-        M01 = matrix.Row0.Y;
-        M02 = matrix.Row0.Z;
+        M00 = matrix.M00;
+        M01 = matrix.M01;
+        M02 = matrix.M02;
         M03 = 0;
-        M10 = matrix.Row1.X;
-        M11 = matrix.Row1.Y;
-        M12 = matrix.Row1.Z;
+        M10 = matrix.M10;
+        M11 = matrix.M11;
+        M12 = matrix.M12;
         M13 = 0;
-        M20 = matrix.Row2.X;
-        M21 = matrix.Row2.Y;
-        M22 = matrix.Row2.Z;
+        M20 = matrix.M20;
+        M21 = matrix.M21;
+        M22 = matrix.M22;
         M23 = 0;
         M30 = 0;
         M31 = 0;
@@ -337,12 +359,12 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     }
 
     /// <summary>
-    /// Creating matrix
+    /// Creates 4x4 matrix.
     /// <code>
-    ///  m00 | m01 | m02 | m03 
-    ///  m10 | m11 | m12 | m13
-    ///  m20 | m21 | m22 | m23
-    ///  m30 | m31 | m32 | m33
+    ///  m00, m01, m02, m03 
+    ///  m10, m11, m12, m13
+    ///  m20, m21, m22, m23
+    ///  m30, m31, m32, m33
     /// </code>
     /// </summary>
     public Matrix4x4(Matrix4x4 matrix)
@@ -364,62 +386,8 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         M32 = matrix.M32;
         M33 = matrix.M33;
     }
-
-    public Vector2 Transform(Vector2 vector)
-    {
-        return new Vector2(
-            M00 * vector.X + M10 * vector.Y + M30,
-            M01 * vector.X + M11 * vector.Y + M31
-        );
-    }
     
-    public Vector3 Transform(Vector3 vector)
-    {
-        return new Vector3(
-            M00 * vector.X + M10 * vector.Y + M20 * vector.Z + M30,
-            M01 * vector.X + M11 * vector.Y + M21 * vector.Z + M31,
-            M02 * vector.X + M12 * vector.Y + M22 * vector.Z + M32 
-        );
-    }
-
-    public Rect2 Transform(Rect2 rect)
-    {
-        var v1 = Transform(rect.TopRight);
-        var v2 = Transform(rect.BottomLeft);
-        return new Rect2(v2.X, v1.Y, v1.X, v2.Y);
-    }
-
-    public Rect4 Transform(Rect4 rect)
-    {
-        return new Rect4(
-            Transform(rect.Point0),
-            Transform(rect.Point1),
-            Transform(rect.Point2),
-            Transform(rect.Point3)
-        );
-    }
-    
-    public Matrix4x4 Transpose(Matrix4x4 matrix4X4)
-    {
-        return new Matrix4x4(
-            M00, M10, M20, M30,
-            M01, M11, M21, M31,
-            M02, M12, M22, M32,
-            M03, M13, M23, M33
-        );
-    }
-
-    public float[] ToArray()
-    {
-        return
-        [
-            M00, M01, M02, M03,
-            M10, M11, M12, M13,
-            M20, M21, M22, M23,
-            M30, M31, M32, M33
-        ];
-    }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Matrix4x4 other)
     {
         return M00.AboutEquals(other.M00) &&
@@ -441,11 +409,13 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     }
 
     [MustDisposeResource]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator IEnumerable.GetEnumerator()
     {
         return ((IEnumerable<float>) this).GetEnumerator();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator<Vector4> IEnumerable<Vector4>.GetEnumerator()
     {
         yield return Row0;
@@ -454,6 +424,7 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         yield return Row3;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator<float> IEnumerable<float>.GetEnumerator()
     {
         yield return M00;
@@ -474,31 +445,37 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         yield return M33;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
         return obj is Matrix4x4 other && Equals(other);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
         return HashCode.Combine(Row0, Row1, Row2, Row3);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
-        return $"{M00}, {M01}, {M02}, {M03}\n{M10}, {M11}, {M12}, {M13}\n{M20}, {M21}, {M22}, {M23}\n{M30}, {M31}, {M32}, {M33}";
+        return $"{M00}, {M01}, {M02}, {M03}, {M10}, {M11}, {M12}, {M13}, {M20}, {M21}, {M22}, {M23}, {M30}, {M31}, {M32}, {M33}";
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Matrix4x4 a, Matrix4x4 b)
     {
         return a.Equals(b);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(Matrix4x4 a, Matrix4x4 b)
     {
         return !a.Equals(b);
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix4x4 operator +(Matrix4x4 a, Matrix4x4 b)
     {
         return new Matrix4x4(
@@ -521,6 +498,45 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         );
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rect2 operator *(Matrix4x4 m, Rect2 r)
+    {
+        var v1 = m * r.TopRight;
+        var v2 = m * r.BottomLeft;
+        return new Rect2(v2.X, v1.Y, v1.X, v2.Y);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rect4 operator *(Matrix4x4 m, Rect4 r)
+    {
+        return new Rect4(
+            m * r.Point0,
+            m * r.Point1,
+            m * r.Point2,
+            m * r.Point3
+        );
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 operator *(Matrix4x4 m, Vector2 v)
+    {
+        return new Vector2(
+            m.M00 * v.X + m.M10 * v.Y + m.M30,
+            m.M01 * v.X + m.M11 * v.Y + m.M31
+        );   
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator *(Matrix4x4 m, Vector3 v)
+    {
+        return new Vector3(
+            m.M00 * v.X + m.M10 * v.Y + m.M20 * v.Z + m.M30,
+            m.M01 * v.X + m.M11 * v.Y + m.M21 * v.Z + m.M31,
+            m.M02 * v.X + m.M12 * v.Y + m.M22 * v.Z + m.M32 
+        );
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector4 operator *(Matrix4x4 m, Vector4 v)
     {
         return new Vector4(
@@ -531,6 +547,7 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
         );
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix4x4 operator *(Matrix4x4 m, float s)
     {
         return new Matrix4x4(
@@ -848,10 +865,10 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     /// <summary>
     /// Creating translate matrix. (column-major)
     /// <code>
-    ///  1  |  0  |  0  |  0 
-    ///  0  |  1  |  0  |  0
-    ///  0  |  0  |  1  |  0
-    ///  x  |  y  |  z  |  1
+    ///  1,  0,  0,  0 
+    ///  0,  1,  0,  0
+    ///  0,  0,  1,  0
+    ///  x,  y,  z,  1
     /// </code>
     /// </summary>
     /// <remarks>
@@ -864,6 +881,7 @@ public readonly partial struct Matrix4x4 : IEquatable<Matrix4x4>, IEnumerable<Ve
     /// - OpenGL traditionally uses column-major
     /// - DirectX uses row-major
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix4x4 CreateTranslation(float x, float y, float z)
     {
         return new Matrix4x4(
