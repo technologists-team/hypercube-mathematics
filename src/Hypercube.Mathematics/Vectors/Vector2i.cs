@@ -7,8 +7,9 @@ using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Vectors;
 
-[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential), DebuggerDisplay("({X}, {Y})")]
+[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[DebuggerDisplay("{ToString()}")]
 public readonly partial struct Vector2i : IEquatable<Vector2i>, IComparable<Vector2i>, IComparable<int>, IEnumerable<int>
 {
     /// <value>
@@ -83,6 +84,16 @@ public readonly partial struct Vector2i : IEquatable<Vector2i>, IComparable<Vect
         get => X * Y;
     }
     
+    /// <summary>
+    /// Gets the component of the vector by index.
+    /// </summary>
+    /// <param name="index">
+    /// The component index: 0 for <see cref="X"/>, 1 for <see cref="Y"/>.
+    /// </param>
+    /// <returns>The int value of the component at the specified index.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="index"/> is not 0 or 1.
+    /// </exception>
     public int this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -92,7 +103,7 @@ public readonly partial struct Vector2i : IEquatable<Vector2i>, IComparable<Vect
             {
                 0 => X,
                 1 => Y,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(index))
             };
         }
     }

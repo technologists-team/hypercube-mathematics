@@ -12,7 +12,6 @@ namespace Hypercube.Mathematics.Shapes;
 [DebuggerDisplay("{ToString()}")]
 public readonly struct Rect2 : IEquatable<Rect2>, IEnumerable<Vector2>, ISpanFormattable
 {
-    public static readonly Rect2 NaN = new(float.NaN, float.NaN, float.NaN, float.NaN);
     public static readonly Rect2 Zero = new(0, 0, 0, 0);
     public static readonly Rect2 UV = new(0, 1, 1, 0);
     public static readonly Rect2 Centered = new(-0.5f, -0.5f, 0.5f, 0.5f);
@@ -106,17 +105,20 @@ public readonly struct Rect2 : IEquatable<Rect2>, IEnumerable<Vector2>, ISpanFor
         get => Width / Height;
     }
 
-    public bool IsValid
+    public Vector2b Fliped
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !float.IsNaN(Left) && !float.IsNaN(Right) && !float.IsNaN(Top) && !float.IsNaN(Bottom);
+        get => new(Left < Right, Bottom < Top);
+    }
+
+    public bool Valid
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Fliped.All;
     }
 
     public Rect2(float left, float top, float right, float bottom)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(left, right, nameof(left));
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(bottom, top, nameof(bottom));
-        
         Left = left;
         Top = top;
         Right = right;
@@ -178,7 +180,8 @@ public readonly struct Rect2 : IEquatable<Rect2>, IEnumerable<Vector2>, ISpanFor
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2 NearestPoint(Vector2 point)
     {
-        return new Vector2(float.Clamp(point.X, Left, Right),
+        return new Vector2(
+            float.Clamp(point.X, Left, Right),
             float.Clamp(point.Y, Top, Bottom));
     }
 
@@ -196,8 +199,8 @@ public readonly struct Rect2 : IEquatable<Rect2>, IEnumerable<Vector2>, ISpanFor
     {
         return other.Left >= Left &&
                other.Right <= Right &&
-               other.Top >= Top
-               && other.Bottom <= Bottom;
+               other.Top >= Top &&
+               other.Bottom <= Bottom;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -221,19 +224,19 @@ public readonly struct Rect2 : IEquatable<Rect2>, IEnumerable<Vector2>, ISpanFor
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
-        return $"[({Left}, {Top}), ({Right}, {Bottom})]";
+        return $"{Left}, {Top}, {Right}, {Bottom}";
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
-        return $"[({Left}, {Top}), ({Right}, {Bottom})]".ToString(formatProvider);
+        return $"{Left}, {Top}, {Right}, {Bottom}".ToString(formatProvider);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
-        return destination.TryWrite(provider, $"[({Left}, {Top}), ({Right}, {Bottom})]", out charsWritten);
+        return destination.TryWrite(provider, $"{Left}, {Top}, {Right}, {Bottom}", out charsWritten);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Hypercube.Mathematics.Extensions;
@@ -7,7 +8,9 @@ using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Vectors;
 
-[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential), DebuggerDisplay("({X}, {Y}, {Z}, {W})")]
+[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+[DebuggerDisplay("{ToString()}")]
 public readonly partial struct Vector4 : IEquatable<Vector4>, IComparable<Vector4>, IComparable<float>, IEnumerable<float>
 {
     /// <value>
@@ -150,6 +153,16 @@ public readonly partial struct Vector4 : IEquatable<Vector4>, IComparable<Vector
         get => new(this);
     }
     
+    /// <summary>
+    /// Gets the component of the vector by index.
+    /// </summary>
+    /// <param name="index">
+    /// The component index: 0 for <see cref="X"/>, 1 for <see cref="Y"/>, 2 for <see cref="Z"/>, 3 for <see cref="W"/>.
+    /// </param>
+    /// <returns>The float value of the component at the specified index.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="index"/> is not 0, 1, 2 or 3.
+    /// </exception>
     public float this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -161,7 +174,7 @@ public readonly partial struct Vector4 : IEquatable<Vector4>, IComparable<Vector
                 1 => Y,
                 2 => Z,
                 3 => W,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(index))
             };
         }
     }

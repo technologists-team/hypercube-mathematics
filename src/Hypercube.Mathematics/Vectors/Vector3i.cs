@@ -7,8 +7,9 @@ using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Vectors;
 
-[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential), DebuggerDisplay("({X}, {Y}, {Z})")]
+[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[DebuggerDisplay("{ToString()}")]
 public readonly partial struct Vector3i : IEquatable<Vector3i>, IComparable<Vector3i>, IComparable<int>, IEnumerable<int>
 {
     /// <value>
@@ -105,6 +106,16 @@ public readonly partial struct Vector3i : IEquatable<Vector3i>, IComparable<Vect
         get => new(X, Y);
     }
     
+    /// <summary>
+    /// Gets the component of the vector by index.
+    /// </summary>
+    /// <param name="index">
+    /// The component index: 0 for <see cref="X"/>, 1 for <see cref="Y"/>, 2 for <see cref="Z"/>.
+    /// </param>
+    /// <returns>The int value of the component at the specified index.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="index"/> is not 0, 1 or 2.
+    /// </exception>
     public int this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -115,7 +126,7 @@ public readonly partial struct Vector3i : IEquatable<Vector3i>, IComparable<Vect
                 0 => X,
                 1 => Y,
                 2 => Z,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(index))
             };
         }
     }
