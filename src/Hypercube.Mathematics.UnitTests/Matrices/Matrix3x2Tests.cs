@@ -2,7 +2,7 @@
 using Hypercube.Mathematics.Matrices;
 using Hypercube.Mathematics.Vectors;
 
-namespace Hypercube.UnitTests.Matrices;
+namespace Hypercube.Mathematics.UnitTests.Matrices;
 
 [TestFixture]
 [SuppressMessage("ReSharper", "InconsistentNaming")]

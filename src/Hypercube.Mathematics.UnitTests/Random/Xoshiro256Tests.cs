@@ -1,6 +1,6 @@
 using Hypercube.Mathematics.Random;
 
-namespace Hypercube.UnitTests.Random;
+namespace Hypercube.Mathematics.UnitTests.Random;
 
 [TestFixture]
 public sealed class Xoshiro256Tests

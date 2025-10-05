@@ -1,7 +1,7 @@
 ﻿using Hypercube.Mathematics.Shapes;
 using Hypercube.Mathematics.Vectors;
 
-namespace Hypercube.UnitTests.Shapes;
+namespace Hypercube.Mathematics.UnitTests.Shapes;
 
 [TestFixture]
 public sealed class Rect2Tests

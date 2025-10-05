@@ -1,6 +1,6 @@
 ﻿using Hypercube.Mathematics;
 
-namespace Hypercube.UnitTests;
+namespace Hypercube.Mathematics.UnitTests;
 
 [TestFixture]
 public sealed class HyperMathTests
