@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Hypercube.Mathematics.Extensions;
@@ -353,13 +354,13 @@ public readonly partial struct Vector2 : IEquatable<Vector2>, IComparable<Vector
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
-        return $"{X}, {Y}";
+        return $"{X.ToString(CultureInfo.InvariantCulture)}, {Y.ToString(CultureInfo.InvariantCulture)}";
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
-        return $"{X}, {Y}".ToString(formatProvider);
+        return ToString().ToString(formatProvider);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -625,4 +626,12 @@ public readonly partial struct Vector2 : IEquatable<Vector2>, IComparable<Vector
             float.Sign(value.X),
             float.Sign(value.Y));
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsNaN(Vector2 value)
+    {
+        return float.IsNaN(value.X) ||
+               float.IsNaN(value.Y);
+    }
+
 }
