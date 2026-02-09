@@ -505,7 +505,7 @@ public readonly partial struct Vector4 : IEquatable<Vector4>, IComparable<Vector
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector4 operator *(float a, Vector4 b)
     {
-        return new Vector4(a * b.X, a * b.Y, a * b.Z, a * b.W);
+        return b * a;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
