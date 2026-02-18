@@ -32,11 +32,6 @@ public readonly struct Angle : IEquatable<Angle>, IEquatable<double>, IComparabl
         Theta = theta;
     }
     
-    public Angle(Vector2 value)
-    {
-        Theta = value.Angle;
-    }
-    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Angle other)
     {
@@ -156,6 +151,12 @@ public readonly struct Angle : IEquatable<Angle>, IEquatable<double>, IComparabl
     public static implicit operator double(Angle angle)
     {
         return angle.Theta;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator float(Angle angle)
+    {
+        return (float) angle.Theta;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

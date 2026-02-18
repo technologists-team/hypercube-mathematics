@@ -133,46 +133,25 @@ public readonly struct Circle : IEquatable<Circle>
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-    {
-        return $"[({Position}), ({Radius})]";
-    }
+    public override string ToString() => $"[({Position}), ({Radius})]";
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Circle other)
-    {
-        return Position.Equals(other.Position) &&
-               Radius.AboutEquals(other.Radius);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Circle other, float tolerance)
-    {
-        return Position.Equals(other.Position, tolerance) &&
-               Radius.AboutEquals(other.Radius, tolerance);
-    }
+    public bool Equals(Circle other) =>
+        Position.Equals(other.Position) && Radius.Equals(other.Radius);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object? obj)
-    {
-        return obj is Circle other && Equals(other);
-    }
+    public bool AboutEquals(Circle other, float tolerance = HyperMath.FloatTolerance) =>
+        Position.AboutEquals(other.Position, tolerance) && Radius.AboutEquals(other.Radius, tolerance);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Position, Radius);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Circle a, Circle b)
-    {
-        return a.Equals(b);
-    }
+    public override bool Equals(object? obj) => obj is Circle other && Equals(other);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Circle a, Circle b)
-    {
-        return !a.Equals(b);
-    }
+    public override int GetHashCode() => HashCode.Combine(Position, Radius);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(Circle a, Circle b) => a.AboutEquals(b);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Circle a, Circle b) => !(a == b);
 }

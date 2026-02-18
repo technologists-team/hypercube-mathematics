@@ -9,6 +9,16 @@ namespace Hypercube.Mathematics.Quaternions;
 public readonly struct Quaternion : IEquatable<Quaternion> 
 {
     private const float SingularityThreshold = 0.4999995f;
+
+    /// <summary>
+    /// Represents a quaternion with no rotation (0, 0, 0, 1).
+    /// </summary>
+    public static readonly Quaternion Identity = new(0, 0, 0, 1);
+
+    /// <summary>
+    /// Represents a quaternion with all components set to zero.
+    /// </summary>
+    public static readonly Quaternion Zero = new(0, 0, 0, 0);
     
     public readonly Vector4 Vector;
 
@@ -162,35 +172,28 @@ public readonly struct Quaternion : IEquatable<Quaternion>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Quaternion FromEuler(float x, float y, float z)
-    {
-        return FromEuler(new Vector3(x, y, z));
-    }
+    public static Quaternion FromEuler(Vector3 vector) => FromEuler(vector.X, vector.Y, vector.Z);
 
     /// <summary>
     /// Created new <see cref="Quaternion"/> from given Euler angles in radians.
-    /// <remarks>
-    /// Taken from <a href="https://github.com/opentk/opentk/blob/master/src/OpenTK.Mathematics/Data/Quaternion.cs#L77">OpenTK.Mathematics/Data/Quaternion.cs</a>
-    /// </remarks>
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Quaternion FromEuler(Vector3 vector3)
+    public static Quaternion FromEuler(float x, float y, float z)
     {
-        var axis = vector3 / 2f;
-        
-        var c1 = MathF.Cos(axis.X);
-        var c2 = MathF.Cos(axis.Y);
-        var c3 = MathF.Cos(axis.Z);
-        
-        var s1 = MathF.Sin(axis.X);
-        var s2 = MathF.Sin(axis.Y);
-        var s3 = MathF.Sin(axis.Z);
-
+        var nx = x / 2f;
+        var ny = y / 2f;
+        var nz = z / 2f;
+        var cx = float.Cos(nx);
+        var cy = float.Cos(ny);
+        var cz = float.Cos(nz);
+        var sx = float.Sin(nx);
+        var sy = float.Sin(ny);
+        var sz = float.Sin(nz);
         return new Quaternion(
-            s1 * c2 * c3 + c1 * s2 * s3,
-            c1 * s2 * c3 - s1 * c2 * s3,
-            c1 * c2 * s3 + s1 * s2 * c3,
-            c1 * c2 * c3 - s1 * s2 * s3
+            sx * cy * cz + cx * sy * sz,
+            cx * sy * cz - sx * cy * sz,
+            cx * cy * sz + sx * sy * cz,
+            cx * cy * cz - sx * sy * sz
         );
     } 
 
@@ -209,29 +212,29 @@ public readonly struct Quaternion : IEquatable<Quaternion>
         var sqz = quaternion.Z * quaternion.Z;
         var sqw = quaternion.W * quaternion.W;
         
-        var unit = sqx + sqy + sqz + sqw; // If normalised is one, otherwise is correction factor
+        var unit = sqx + sqy + sqz + sqw; // If normalized is one, otherwise is correction factor
         var singularityTest = quaternion.X * quaternion.Z + quaternion.W * quaternion.Y;
         
         if (singularityTest > SingularityThreshold * unit)
-            // Singularity at north pole
+            // Singularity at North Pole
             return new Vector3(
                 0,
                 HyperMath.PIOver2F,
-                2f * MathF.Atan2(quaternion.X, quaternion.W)
+                2f * float.Atan2(quaternion.X, quaternion.W)
             );
 
         if (singularityTest < -SingularityThreshold * unit)
-            // Singularity at south pole
+            // Singularity at South Pole
             return new Vector3(
                 0,
                 -HyperMath.PIOver2F,
-                -2f * MathF.Atan2(quaternion.X, quaternion.W)
+                -2f * float.Atan2(quaternion.X, quaternion.W)
             );
 
         return new Vector3(
-            MathF.Atan2(2 * (quaternion.W * quaternion.X - quaternion.Y * quaternion.Z), sqw - sqx - sqy + sqz),
-            MathF.Asin(2 * singularityTest / unit),
-            MathF.Atan2(2 * (quaternion.W * quaternion.Z - quaternion.X * quaternion.Y), sqw + sqx - sqy - sqz)
+            float.Atan2(2 * (quaternion.W * quaternion.X - quaternion.Y * quaternion.Z), sqw - sqx - sqy + sqz),
+            float.Asin(2 * singularityTest / unit),
+            float.Atan2(2 * (quaternion.W * quaternion.Z - quaternion.X * quaternion.Y), sqw + sqx - sqy - sqz)
         );
     }
 }

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Hypercube.Mathematics.Extensions;
 using JetBrains.Annotations;
+
 using Vector2 = Hypercube.Mathematics.Vectors.Vector2;
 using Vector3 = Hypercube.Mathematics.Vectors.Vector3;
 
@@ -13,7 +14,7 @@ namespace Hypercube.Mathematics.Matrices;
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [DebuggerDisplay("{ToString()}")]
-public readonly partial struct Matrix3x2 : IEquatable<Matrix3x2>, IEnumerable<Vector2>, IEnumerable<float>
+public readonly struct Matrix3x2 : IMatrix, IEquatable<Matrix3x2>, IEnumerable<Vector2>, IEnumerable<float>
 {
     /// <value>
     /// <code>

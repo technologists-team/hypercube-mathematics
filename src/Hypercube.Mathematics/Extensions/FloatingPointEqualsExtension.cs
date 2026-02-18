@@ -7,13 +7,13 @@ namespace Hypercube.Mathematics.Extensions;
 public static class FloatingPointEqualsExtension
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool AboutEquals(this float @this, float value, float tolerance = 1E-15f)
+    public static bool AboutEquals(this float @this, float value, float tolerance = HyperMath.FloatTolerance)
     {
         return HyperMath.AboutEquals(@this, value, tolerance);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool AboutEquals(this double @this, double value, double tolerance = 1E-15d)
+    public static bool AboutEquals(this double @this, double value, double tolerance = HyperMath.DoubleTolerance)
     {
         return HyperMath.AboutEquals(@this, value, tolerance);
     }
