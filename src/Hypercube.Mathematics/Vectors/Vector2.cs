@@ -403,6 +403,13 @@ public readonly struct Vector2 :
 
     #endregion
 
+    #region Math
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Clamp(Vector2 min, Vector2 max) => Clamp(this, min, max);
+
+    #endregion
+    
     #region Static Math
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

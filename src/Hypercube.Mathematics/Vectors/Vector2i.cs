@@ -385,6 +385,9 @@ public readonly struct Vector2i :
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2i operator /(Vector2i a, int b) => new(a.AsVector64() / b);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 operator /(Vector2i a, float b) => (Vector2) a / b;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2i((int x, int y) a) => new(a.x, a.y);
@@ -393,4 +396,6 @@ public readonly struct Vector2i :
     public static implicit operator (int x, int y)(Vector2i a) => (a.X, a.Y);
     
     #endregion
+    
+    public static implicit operator Vector2(Vector2i v) => new(v.X, v.Y);
 }

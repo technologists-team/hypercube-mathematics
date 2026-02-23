@@ -277,6 +277,11 @@ public readonly struct Vector3 :
     public Vector3(double scalar) : this((float)scalar)
     {
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3(Vector2 vector, float z = 0) : this(vector.X, vector.Y, z)
+    {
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector3(Vector3 vector) : this(vector.X, vector.Y, vector.Z)
@@ -314,7 +319,13 @@ public readonly struct Vector3 :
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector3 WithZ(float value) => new(X, Y, value);
-    
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3 WithXy(Vector2 value) => new(value.X, value.Y, Z);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3 WithXy(Vector3 value) => new(value.X, value.Y, Z);
+
     #region Cast
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -471,6 +482,9 @@ public readonly struct Vector3 :
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 operator +(Vector3 a, Vector3 b) => new(a.AsVector128() + b.AsVector128());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator +(Vector3 a, Vector2 b) => a + new Vector3(b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 operator +(Vector3 a, Vector128<float> b) => new(a.AsVector128() + b);
@@ -488,6 +502,9 @@ public readonly struct Vector3 :
     public static Vector3 operator -(Vector3 a, Vector3 b) => new(a.AsVector128() - b.AsVector128());
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator -(Vector3 a, Vector2 b) => a - new Vector3(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 operator -(Vector3 a, Vector128<float> b) => new(a.AsVector128() - b);
         
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -503,6 +520,9 @@ public readonly struct Vector3 :
     public static Vector3 operator *(Vector3 a, Vector3 b) => new(a.AsVector128() * b.AsVector128());
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator *(Vector3 a, Vector2 b) => a * new Vector3(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 operator *(Vector3 a, float b) => new(a.AsVector128() * b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -512,7 +532,13 @@ public readonly struct Vector3 :
     public static Vector3 operator /(Vector3 a, Vector3 b) => new(a.AsVector128() / b.AsVector128());
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator /(Vector3 a, Vector2 b) => a / new Vector3(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 operator /(Vector3 a, float b) => new(a.AsVector128() / b);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator /(float a, Vector3 b) => new(Vector128.Create(a) / b.AsVector128());
+    
     #endregion
 }

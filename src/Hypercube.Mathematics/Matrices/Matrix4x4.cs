@@ -368,7 +368,7 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
         M00 = matrix.M00; M01 = matrix.M01; M02 = matrix.M02; M03 = 0;
         M10 = matrix.M10; M11 = matrix.M11; M12 = matrix.M12; M13 = 0;
         M20 = matrix.M20; M21 = matrix.M21; M22 = matrix.M22; M23 = 0;
-        M30 = 0; M31 = 0; M32 = 0; M33 = 0;
+        M30 = 0; M31 = 0; M32 = 0; M33 = 1;
     }
     
     /// <summary>
@@ -831,12 +831,12 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
         var m21 = 2 * (yz - wx) * scale.Y;
         var m22 = (1 - 2 * (yy + xx)) * scale.Z;
 
-        // Create a TRS matrix (Scale -> Rotation -> Translation)
+        // Create a TRS matrix
         return new Matrix4x4(
-            m00, m01, m02, position.X,
-            m10, m11, m12, position.Y,
-            m20, m21, m22, position.Z,
-              0,   0,   0,          1
+                   m00,        m10,        m20, 0,
+                   m01,        m11,        m21, 0,
+                   m02,        m12,        m22, 0,
+            position.X, position.Y, position.Z, 1
         );
     }
     
@@ -1085,10 +1085,10 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
         var invFN = 1.0f / (zFar - zNear);
 
         return new Matrix4x4(
-            2f * invRL, 0,          0,           -(right + left) * invRL, // Row 0
-            0,          2f * invTB, 0,           -(top + bottom) * invTB, // Row 1
+            2f * invRL, 0,           0,          -(right + left) * invRL, // Row 0
+            0,          2f * invTB,  0,          -(top + bottom) * invTB, // Row 1
             0,          0,          -2f * invFN, -(zFar + zNear) * invFN, // Row 2
-            0,          0,          0,           1                        // Row 3
+            0,          0,           0,                                 1 // Row 3
         );
     }
 

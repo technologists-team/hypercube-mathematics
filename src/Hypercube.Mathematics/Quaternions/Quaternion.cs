@@ -124,6 +124,12 @@ public readonly struct Quaternion : IEquatable<Quaternion>
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3 ToEulerDeg()
+    {
+        return ToEuler(this) * HyperMath.RadiansToDegreesF;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Quaternion other)
     {
         return Vector == other.Vector;
@@ -146,18 +152,6 @@ public readonly struct Quaternion : IEquatable<Quaternion>
     {
         return Vector.ToString();
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Quaternion operator *(Quaternion a, Quaternion b)
-    {
-        return new Quaternion(a.Vector * b.Vector);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Quaternion operator *(Quaternion a, float b)
-    {
-        return new Quaternion(a.Vector * b);
-    }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Quaternion a, Quaternion b)
@@ -174,10 +168,12 @@ public readonly struct Quaternion : IEquatable<Quaternion>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Quaternion FromEuler(Vector3 vector) => FromEuler(vector.X, vector.Y, vector.Z);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Quaternion FromEulerZ(float z) => FromEuler(0, 0, z);
+
     /// <summary>
     /// Created new <see cref="Quaternion"/> from given Euler angles in radians.
     /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Quaternion FromEuler(float x, float y, float z)
     {
         var nx = x / 2f;
@@ -195,7 +191,7 @@ public readonly struct Quaternion : IEquatable<Quaternion>
             cx * cy * sz + sx * sy * cz,
             cx * cy * cz - sx * sy * sz
         );
-    } 
+    }
 
     /// <summary>
     /// Convert this instance to an Euler angle representation.
@@ -204,7 +200,6 @@ public readonly struct Quaternion : IEquatable<Quaternion>
     /// </remarks>
     /// </summary>
     /// <returns>Euler angle in radians</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 ToEuler(Quaternion quaternion)
     {
         var sqx = quaternion.X * quaternion.X;
@@ -235,6 +230,26 @@ public readonly struct Quaternion : IEquatable<Quaternion>
             float.Atan2(2 * (quaternion.W * quaternion.X - quaternion.Y * quaternion.Z), sqw - sqx - sqy + sqz),
             float.Asin(2 * singularityTest / unit),
             float.Atan2(2 * (quaternion.W * quaternion.Z - quaternion.X * quaternion.Y), sqw + sqx - sqy - sqz)
+        );
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Quaternion operator +(Quaternion a, Quaternion b) => new(a.Vector + b.Vector);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Quaternion operator -(Quaternion a, Quaternion b) => new(a.Vector - b.Vector);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Quaternion operator -(Quaternion a) => new(-a.Vector);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Quaternion operator *(Quaternion a, Quaternion b)
+    {
+        return new Quaternion(
+            a.W * b.X + a.X * b.W + a.Y * b.Z - a.Z * b.Y,
+            a.W * b.Y + a.Y * b.W + a.Z * b.X - a.X * b.Z,
+            a.W * b.Z + a.Z * b.W + a.X * b.Y - a.Y * b.X,
+            a.W * b.W - a.X * b.X - a.Y * b.Y - a.Z * b.Z
         );
     }
 }
