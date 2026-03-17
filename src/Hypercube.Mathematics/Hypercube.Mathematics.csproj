@@ -14,6 +14,7 @@
         <Authors>TornadoTech</Authors>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <RepositoryUrl>https://github.com/technologists-team/hypercube-mathematics</RepositoryUrl>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

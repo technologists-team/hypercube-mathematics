@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Vectors;
@@ -13,27 +15,48 @@ namespace Hypercube.Mathematics.Vectors;
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [DebuggerDisplay("{ToString()}")]
-public readonly partial struct Vector2b : IEquatable<Vector2b>, IEnumerable<bool>, ISpanFormattable
+public readonly struct Vector2b : IEquatable<Vector2b>, IEnumerable<bool>, ISpanFormattable
 {
-    /// <value>
-    /// Vector (0, 0).
-    /// </value>
+    #region Constants
+    
+    /// <summary>
+    /// The number of components in the vector.
+    /// </summary>
+    public const int Dimensionality = 2;
+    
+    /// <summary>
+    /// A vector where all elements are false.
+    /// <code>
+    /// false, false
+    /// </code>
+    /// </summary>
     public static readonly Vector2b Zero = new(false);
     
-    /// <value>
-    /// Vector (1, 1).
-    /// </value>
+    /// <summary>
+    /// A vector where all elements are true.
+    /// <code>
+    /// true, true
+    /// </code>
+    /// </summary>
     public static readonly Vector2b One = new(true);
     
-    /// <value>
-    /// Vector (1, 0).
-    /// </value>
+    /// <summary>
+    /// A vector where only X element is true.
+    /// <code>
+    /// true, false
+    /// </code>
+    /// </summary>
     public static readonly Vector2b UnitX = new(true, false);
     
-    /// <value>
-    /// Vector (0, 1).
-    /// </value>
+    /// <summary>
+    /// A vector where only Y element is true.
+    /// <code>
+    /// false, true
+    /// </code>
+    /// </summary>
     public static readonly Vector2b UnitY = new(false, true);
+    
+    #endregion
     
     /// <summary>
     /// Vector X component.
@@ -99,73 +122,140 @@ public readonly partial struct Vector2b : IEquatable<Vector2b>, IEnumerable<bool
         get => !X & Y;
     }
     
-    /// <summary>
-    /// Gets the component of the vector by index.
-    /// </summary>
-    /// <param name="index">
-    /// The component index: 0 for <see cref="X"/>, 1 for <see cref="Y"/>.
-    /// </param>
-    /// <returns>The bool value of the component at the specified index.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">
-    /// Thrown when <paramref name="index"/> is not 0 or 1.
-    /// </exception>
     public bool this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get
-        {
-            return index switch
-            {
-                0 => X,
-                1 => Y,
-                _ => throw new ArgumentOutOfRangeException(nameof(index))
-            };
-        }
+        get => Get(index);
     }
     
-    /// <summary>
-    /// Initializes a new vector with specified X and Y components.
-    /// </summary>
-    /// <param name="x">Value for the X component.</param>
-    /// <param name="y">Value for the Y component.</param>
+    #region Constructors
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2b(bool x, bool y)
     {
         X = x;
         Y = y;
     }
-    
-    /// <summary>
-    /// Initializes a new vector with both components set to the same value.
-    /// </summary>
-    /// <param name="value">Value for both X and Y components.</param>
-    public Vector2b(bool value)
-    {
-        X = value;
-        Y = value;
-    }
-    
-    /// <summary>
-    /// Returns a new vector with the X component replaced.
-    /// </summary>
-    /// <param name="value">New X value.</param>
-    /// <returns>A new <see cref="Vector2b"/> with updated X.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2b WithX(bool value)
-    {
-        return new Vector2b(value, Y);
-    }
-    
-    /// <summary>
-    /// Returns a new vector with the Y component replaced.
-    /// </summary>
-    /// <param name="value">New Y value.</param>
-    /// <returns>A new <see cref="Vector2b"/> with updated Y.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2b WithY(bool value)
-    {
-        return new Vector2b(X, value);
-    }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2b(bool scalar) : this(scalar, scalar)
+    {
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2b(Vector64<bool> vector)
+    {
+        this = Unsafe.As<Vector64<bool>, Vector2b>(ref vector);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2b(Vector64<byte> vector)
+    {
+        this = Unsafe.As<Vector64<byte>, Vector2b>(ref vector);
+    }
+    
+    #endregion
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out bool x, out bool y)
+    {
+        x = X;
+        y = Y;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Get(int index)
+    {
+        Tools.ThrowIfOutOfRange(index, 0, Dimensionality);
+        return Unsafe.Add(ref Unsafe.AsRef(in X), index);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2b WithX(bool value) => new(value, Y);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2b WithY(bool value) => new(X, value);
+
+    #region Cast
+    
+    /// <summary>
+    /// Returns a new array containing the vector elements.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool[] AsArray() => [X, Y];
+    
+    /// <summary>
+    /// Returns a new read-only span containing the vector elements.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ReadOnlySpan<bool> AsSpan() => AsUnsafeSpan();
+
+    /// <summary>
+    /// Returns a mutable <see cref="Span{byte}"/> pointing directly to the vector memory.
+    /// </summary>
+    /// <remarks>
+    /// <b>WARNING:</b> This bypasses the readonly constraint.
+    /// <para>
+    /// For safe, read-only access, use <see cref="AsSpan"/> instead.
+    /// </para>
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Span<bool> AsUnsafeSpan() =>
+        MemoryMarshal.CreateSpan(ref Unsafe.AsRef(in X), Dimensionality);
+    
+    /// <summary>
+    /// Converts this vector to a SIMD Vector64 representation.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Vector64<bool> AsVector64() =>
+        Unsafe.As<Vector2b, Vector64<bool>>(ref Unsafe.AsRef(in this));
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Vector64<byte> AsVector64Byte()
+        => Unsafe.As<Vector2b, Vector64<byte>>(ref Unsafe.AsRef(in this));
+
+    #endregion
+
+    #region Equality
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Vector2b other) =>
+        X == other.X &&
+        Y == other.Y;
+
+    /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override bool Equals(object? obj) =>
+        obj is Vector2b other && Equals(other);
+
+    /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override int GetHashCode() =>
+        HashCode.Combine(X, Y);
+
+    #endregion
+    
+    #region String Formating
+    
+    /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override string ToString() =>
+        ToString(null, CultureInfo.InvariantCulture);
+
+    /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToString(string? format, IFormatProvider? formatProvider) =>
+        $"{X}, {Y}".ToString(formatProvider);
+
+    /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) =>
+        destination.TryWrite(provider, $"{X}, {Y}", out charsWritten);
+
+    #endregion
+    
+    #region IEnumerable
+    
     /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator IEnumerable.GetEnumerator()
@@ -173,9 +263,6 @@ public readonly partial struct Vector2b : IEquatable<Vector2b>, IEnumerable<bool
         return GetEnumerator();
     }
 
-    /// <summary>
-    /// Returns an enumerator that iterates over the components (X, Y) of the vector.
-    /// </summary>
     /// <returns>Enumerator of type <see cref="bool"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerator<bool> GetEnumerator()
@@ -184,68 +271,57 @@ public readonly partial struct Vector2b : IEquatable<Vector2b>, IEnumerable<bool
         yield return Y;
     }
 
-    /// <summary>
-    /// Determines whether the specified <see cref="Vector2b"/> is equal to the current vector.
-    /// </summary>
-    /// <param name="other">The vector to compare with the current vector.</param>
-    /// <returns><c>true</c> if equal; otherwise, <c>false</c>.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Vector2b other)
-    {
-        return X == other.X &&
-               Y == other.Y;
-    }
+    #endregion
     
-    /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object? obj)
-    {
-        return obj is Vector2b other && Equals(other);
-    }
+    #region Static Math
 
-    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(X, Y);
-    }
-
-    /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-    {
-        return $"{X}, {Y}";
-    }
-
-    /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string ToString(string? format, IFormatProvider? formatProvider)
-    {
-        return $"{X}, {Y}".ToString(formatProvider);
-    }
+    public static Vector2b Nand(Vector2b a, Vector2b b)
+        => new(!(a.X & b.X), !(a.Y & b.Y));
     
-    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
-    {
-        return destination.TryWrite(provider, $"{X}, {Y}", out charsWritten);
-    }
+    public static Vector2b Nor(Vector2b a, Vector2b b)
+        => new(!(a.X | b.X), !(a.Y | b.Y));
     
-    /// <summary>
-    /// Determines whether two vectors are equal.
-    /// </summary>
+    #endregion
+    
+    #region Operators
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Vector2b left, Vector2b right)
-    {
-        return left.Equals(right);
-    }
+    public static bool operator ==(Vector2b a, Vector2b b) => a.Equals(b);
 
-    /// <summary>
-    /// Determines whether two vectors are not equal.
-    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Vector2b left, Vector2b right)
-    {
-        return !left.Equals(right);
-    }
+    public static bool operator !=(Vector2b a, Vector2b b) => !(a == b);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2b operator !(Vector2b a)
+        => new(!a.X, !a.Y);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2b operator &(Vector2b a, Vector2b b)
+        => new(a.X & b.X, a.Y & b.Y);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2b operator |(Vector2b a, Vector2b b)
+        => new(a.X | b.X, a.Y | b.Y);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2b operator ^(Vector2b a, Vector2b b)
+        => new(a.X ^ b.X, a.Y ^ b.Y);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator true(Vector2b v)
+        => v is { X: true, Y: true };
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator false(Vector2b v)
+        => !v.X || !v.Y;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Vector2b((bool x, bool y) a) => new(a.x, a.y);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator (bool x, bool y)(Vector2b a) => (a.X, a.Y);
+    
+    #endregion
 }

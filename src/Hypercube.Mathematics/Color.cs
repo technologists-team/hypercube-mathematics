@@ -146,6 +146,11 @@ public readonly struct Color
             : byte.MaxValue;
     }
 
+    public Color WithA(float a)
+    {
+        return new Color(R, G, B, a.NormalizedFloatToByte());
+    }
+
     /// <summary>
     /// Returns the color as a hexadecimal string in the format #RRGGBBAA.
     /// </summary>

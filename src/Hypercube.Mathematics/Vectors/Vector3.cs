@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using Hypercube.Mathematics.Extensions;
 using JetBrains.Annotations;
 
@@ -10,337 +13,396 @@ namespace Hypercube.Mathematics.Vectors;
 
 /// <summary>
 /// Represents a vector with three single-precision floating-point values.
+/// Optimized with SIMD.
 /// </summary>
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [DebuggerDisplay("{ToString()}")]
-public readonly partial struct Vector3 : IEquatable<Vector3>, IComparable<Vector3>, IComparable<float>, IEnumerable<float>
+public readonly struct Vector3 :
+    IEquatable<Vector3>,
+    IComparable<Vector3>,
+    IComparable<float>,
+    IEnumerable<float>,
+    ISpanFormattable,
+    IAdditionOperators<Vector3, Vector3, Vector3>,
+    ISubtractionOperators<Vector3, Vector3, Vector3>,
+    IMultiplyOperators<Vector3, Vector3, Vector3>,
+    IMultiplyOperators<Vector3, float, Vector3>,
+    IDivisionOperators<Vector3, Vector3, Vector3>,
+    IDivisionOperators<Vector3, float, Vector3>,
+    IUnaryPlusOperators<Vector3, Vector3>,
+    IUnaryNegationOperators<Vector3, Vector3>,
+    IAdditiveIdentity<Vector3, Vector3>,
+    IMultiplicativeIdentity<Vector3, Vector3>,
+    IEqualityOperators<Vector3, Vector3, bool>,
+    IMinMaxValue<Vector3>
 {
-    /// <value>
-    /// Vector (float.NaN, float.NaN, float.NaN).
-    /// </value>
+    #region Constants
+    
+    /// <summary>
+    /// The number of components in the vector.
+    /// </summary>
+    public const int Dimensionality = 3;
+    
+    /// <summary>
+    /// A vector where all elements are <see cref="float.NaN"/>.
+    /// <code>
+    /// NaN, NaN
+    /// </code>
+    /// </summary>
     public static readonly Vector3 NaN = new(float.NaN);
     
-    /// <value>
-    /// Vector (float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity).
-    /// </value>
+    /// <summary>
+    /// A vector where all elements are <see cref="float.PositiveInfinity"/>.
+    /// <code>
+    /// PositiveInfinity, PositiveInfinity
+    /// </code>
+    /// </summary>
     public static readonly Vector3 PositiveInfinity = new(float.PositiveInfinity);
     
-    /// <value>
-    /// Vector (float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity).
-    /// </value>
+    /// <summary>
+    /// A vector where all elements are <see cref="float.NegativeInfinity"/>.
+    /// <code>
+    /// NegativeInfinity, NegativeInfinity
+    /// </code>
+    /// </summary>
     public static readonly Vector3 NegativeInfinity = new(float.NegativeInfinity);
     
-    /// <value>
-    /// Vector (0, 0, 0).
-    /// </value>
-    public static readonly Vector3 Zero = new(0, 0, 0);
-    
-    /// <value>
-    /// Vector (1, 1, 1).
-    /// </value>
-    public static readonly Vector3 One = new(1, 1, 1);
-
-    /// <value>
-    /// Vector (1, 0, 0).
-    /// </value>
-    public static readonly Vector3 UnitX = new(1, 0, 0);
-    
-    /// <value>
-    /// Vector (0, 1, 0).
-    /// </value>
-    public static readonly Vector3 UnitY = new(0, 1, 0);
-    
-    /// <value>
-    /// Vector (0, 0, 1).
-    /// </value>
-    public static readonly Vector3 UnitZ = new(0, 0, 1);
+    /// <summary>
+    /// A vector where all elements are <see cref="float.MaxValue"/>.
+    /// <code>
+    /// MaxValue, MaxValue
+    /// </code>
+    /// </summary>
+    public static readonly Vector3 Max = new(float.MaxValue);
     
     /// <summary>
-    /// Vector X component.
+    /// A vector where all elements are <see cref="float.MinValue"/>.
+    /// <code>
+    /// MinValue, MinValue
+    /// </code>
+    /// </summary>
+    public static readonly Vector3 Min = new(float.MinValue);
+    
+    /// <summary>
+    /// A vector where all elements are zero.
+    /// <code>
+    /// 0, 0, 0
+    /// </code>
+    /// </summary>
+    public static readonly Vector3 Zero = new(0f);
+    
+    /// <summary>
+    /// A vector where all elements are one.
+    /// <code>
+    /// 1, 1, 1
+    /// </code>
+    /// </summary>
+    public static readonly Vector3 One = new(1f);
+    
+    /// <summary>
+    /// A vector where only X element is one.
+    /// <code>
+    /// 1, 0, 0
+    /// </code>
+    /// </summary>
+    public static readonly Vector3 UnitX = new(1f, 0f, 0f);
+    
+    /// <summary>
+    /// A vector where only Y element is one.
+    /// <code>
+    /// 0, 1, 0
+    /// </code>
+    /// </summary>
+    public static readonly Vector3 UnitY = new(0f, 1f, 0f);
+    
+    /// <summary>
+    /// A vector where only Z element is one.
+    /// <code>
+    /// 0, 0, 1
+    /// </code>
+    /// </summary>
+    public static readonly Vector3 UnitZ = new(0f, 0f, 1f);
+    
+    #endregion
+    
+    public static Vector3 AdditiveIdentity
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Zero;
+    }
+
+    public static Vector3 MultiplicativeIdentity
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => One;
+    }
+
+    public static Vector3 MinValue
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Min;
+    }
+
+    public static Vector3 MaxValue
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Max;
+    }
+
+    #region Fields
+    
+    /// <summary>
+    /// The X component of the vector.
     /// </summary>
     public readonly float X;
-    
+
     /// <summary>
-    /// Vector Y component.
+    /// The Y component of the vector.
     /// </summary>
     public readonly float Y;
     
     /// <summary>
-    /// Vector Z component.
+    /// The Z component of the vector.
     /// </summary>
     public readonly float Z;
     
-    /// <summary>
-    /// Gets the square of the vector length (magnitude).
-    /// </summary>
-    /// <remarks>
-    /// Allows you to avoid using the rather expensive sqrt operation.
-    /// (On ARM64 hardware <see cref="Length"/> may use the FRSQRTE instruction, which would take away this advantage).
-    /// </remarks>
-    /// <seealso cref="Length"/>
+    #endregion
+    
+    public Vector3 Absolute
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Abs(this);
+    }
+
+    public Vector3 Rounded
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Round(this);
+    }
+
+    public Vector3 Floored
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Floor(this);
+    }
+
+    public Vector3 Ceiled
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Ceiling(this);
+    }
+
+    public float AspectRatio
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => X / Y;
+    }
+    
     public float LengthSquared
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => X * X + Y * Y + Z * Z;
+        get => Dot(this, this);
     }
-    
-    /// <summary>
-    /// Gets the length (magnitude) of the vector.
-    /// </summary>
-    /// <remarks>
-    /// On ARM64 hardware this may use the FRSQRTE instruction
-    /// which performs a single Newton-Raphson iteration.
-    /// On hardware without specialized support
-    /// sqrt is used, which makes the method less fast.
-    /// </remarks>
-    /// <seealso cref="LengthSquared"/>
+
     public float Length
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => 1f / MathF.ReciprocalSqrtEstimate(LengthSquared);
+        get => float.Sqrt(LengthSquared);
     }
 
-    /// <summary>
-    /// Copy of scaled to unit length.
-    /// </summary>
+    public float LengthFast
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => 1f / float.ReciprocalSqrtEstimate(LengthSquared);
+    }
+
     public Vector3 Normalized
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => this / Length;
     }
 
-    /// <summary>
-    /// Summation of all vector components.
-    /// </summary>
+    public Vector3 NormalizedFast
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => this / LengthFast;
+    }
+
     public float Summation
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => X + Y + Z;
     }
 
-    /// <summary>
-    /// Production of all vector components.
-    /// </summary>
-    public float Production 
+    public float Production
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => X * Y * Z;
     }
-
+    
     public Vector2 Xy
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => new(X, Y);
     }
 
-    public Color Color
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(this);
-    }
-    
-    /// <summary>
-    /// Gets the component of the vector by index.
-    /// </summary>
-    /// <param name="index">
-    /// The component index: 0 for <see cref="X"/>, 1 for <see cref="Y"/>, 2 for <see cref="Z"/>.
-    /// </param>
-    /// <returns>The float value of the component at the specified index.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">
-    /// Thrown when <paramref name="index"/> is not 0, 1 or 2.
-    /// </exception>
     public float this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get
-        {
-            return index switch
-            {
-                0 => X,
-                1 => Y,
-                2 => Z,
-                _ => throw new ArgumentOutOfRangeException(nameof(index))
-            };
-        }
+        get => Get(index);
     }
-    
+
+    #region Constructors
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector3(float x, float y, float z)
     {
         X = x;
         Y = y;
         Z = z;
     }
-    
-    public Vector3(float value)
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3(double x, double y, double z) : this((float) x, (float) y, (float) z)
     {
-        X = value;
-        Y = value;
-        Z = value;
-    }
-    
-    public Vector3(double x, double y, double z)
-    {
-        X = (float) x;
-        Y = (float) y;
-        Z = (float) z;
-    }
-    
-    public Vector3(double value)
-    {
-        X = (float) value;
-        Y = (float) value;
-        Z = (float) value;
-    }
-    
-    public Vector3(Vector2 value)
-    {
-        X = value.X;
-        Y = value.Y;
-        Z = 0;
-    }
-    
-    public Vector3(Vector2 value, float z)
-    {
-        X = value.X;
-        Y = value.Y;
-        Z = z;
     }
 
-    public Vector3(Vector3 value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3(float scalar) : this(scalar, scalar, scalar)
     {
-        X = value.X;
-        Y = value.Y;
-        Z = value.Z;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3(double scalar) : this((float)scalar)
+    {
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 WithX(float value)
+    public Vector3(Vector2 vector, float z = 0) : this(vector.X, vector.Y, z)
     {
-        return new Vector3(value, Y, Z);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3(Vector3 vector) : this(vector.X, vector.Y, vector.Z)
+    {
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3(Vector128<float> vector)
+    {
+        this = Unsafe.As<Vector128<float>, Vector3>(ref vector);
+    }
+
+    #endregion
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Deconstruct(out float x, out float y, out float z)
+    {
+        x = X;
+        y = Y;
+        z = Z;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 WithY(float value)
+    public float Get(int index)
     {
-        return new Vector3(X, value, Z);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 WithZ(float value)
-    {
-        return new Vector3(X, Y, value);
+        Tools.ThrowIfOutOfRange(index, 0, Dimensionality);
+        return Unsafe.Add(ref Unsafe.AsRef(in X), index);
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float DistanceSquared(Vector3 value)
-    {
-        return DistanceSquared(this, value);
-    }
+    public Vector3 WithX(float value) => new(value, Y, Z);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float Distance(Vector3 value)
-    {
-        return Distance(this, value);
-    }
+    public Vector3 WithY(float value) => new(X, value, Z);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Cross(Vector3 value)
-    {
-        return Cross(this, value);
-    }
+    public Vector3 WithZ(float value) => new(X, Y, value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3 WithXy(Vector2 value) => new(value.X, value.Y, Z);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3 WithXy(Vector3 value) => new(value.X, value.Y, Z);
+
+    #region Cast
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Color AsColor(float a = 1f) => new(this, a);
     
+    /// <summary>
+    /// Returns a new array containing the vector elements.
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float Dot(Vector3 value)
-    {
-        return Dot(this, value);
-    }
+    public float[] AsArray() => [X, Y, Z];
     
+    /// <summary>
+    /// Returns a new read-only span containing the vector elements.
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Reflect(Vector3 normal)
-    {
-        return Reflect(this, normal);
-    }
+    public ReadOnlySpan<float> AsSpan() => AsUnsafeSpan();
+
+    /// <summary>
+    /// Returns a mutable <see cref="Span{float}"/> pointing directly to the vector memory.
+    /// </summary>
+    /// <remarks>
+    /// <b>WARNING:</b> This bypasses the readonly constraint.
+    /// <para>
+    /// For safe, read-only access, use <see cref="AsSpan"/> instead.
+    /// </para>
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Span<float> AsUnsafeSpan() => MemoryMarshal.CreateSpan(ref Unsafe.AsRef(in X), Dimensionality);
     
+    /// <summary>
+    /// Converts this vector to a SIMD Vector128 representation.
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 MoveTowards(Vector3 target, float distance)
-    {
-        return MoveTowards(this, target, distance);
-    }
+    private Vector128<float> AsVector128() => Unsafe.As<Vector3, Vector128<float>>(ref Unsafe.AsRef(in this));
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Clamp(Vector3 min, Vector3 max)
-    {
-        return Clamp(this, min, max);
-    }
+    #endregion
+    
+    #region Equality
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Clamp(float min, float max)
-    {
-        return Clamp(this, min, max);
-    }
+    public bool Equals(Vector3 other) =>
+        X.Equals(other.X) &&
+        Y.Equals(other.Y) &&
+        Z.Equals(other.Z);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Lerp(Vector3 value, float amount)
-    {
-        return Lerp(this, value, amount);
-    }
+    public bool AboutEquals(Vector3 other, float tolerance = HyperMath.FloatTolerance) =>
+        X.AboutEquals(other.X, tolerance) &&
+        Y.AboutEquals(other.Y, tolerance) &&
+        Z.AboutEquals(other.Z, tolerance);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Max(Vector3 value)
-    {
-        return Max(this, value);
-    }
+    public override bool Equals(object? obj) =>
+        obj is Vector3 other && Equals(other);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Min(Vector3 value)
-    {
-        return Min(this, value);
-    }
+    public override int GetHashCode() =>
+        HashCode.Combine(X, Y, Z);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Abs()
-    {
-        return Abs(this);
-    }
+    #endregion
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Round()
-    {
-        return Round(this);
-    }
+    #region Formatting
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Round(int digits)
-    {
-        return Round(this, digits);
-    }
+    public override string ToString() =>
+        ToString(null, CultureInfo.InvariantCulture);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Ceiling()
-    {
-        return Ceiling(this);
-    }
+    public string ToString(string? format, IFormatProvider? provider) =>
+        $"{X.ToString(format, provider)}, {Y.ToString(format, provider)}, {Z.ToString(format, provider)}";
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3 Floor()
-    {
-        return Floor(this);
-    }
+    public bool TryFormat(Span<char> destination, out int charsWritten,
+        ReadOnlySpan<char> format, IFormatProvider? provider) =>
+        destination.TryWrite(provider, $"{X}, {Y}, {Z}", out charsWritten);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int CompareTo(Vector3 other)
-    {
-        return LengthSquared.CompareTo(other.LengthSquared);
-    }
+    #endregion
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int CompareTo(float other)
-    {
-        return LengthSquared.CompareTo(other * other);
-    }
+    #region IEnumerable
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
     public IEnumerator<float> GetEnumerator()
     {
         yield return X;
@@ -348,298 +410,135 @@ public readonly partial struct Vector3 : IEquatable<Vector3>, IComparable<Vector
         yield return Z;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    #endregion
+
+    #region Comparison
+
+    public int CompareTo(Vector3 other) =>
+        LengthSquared.CompareTo(other.LengthSquared);
+
+    public int CompareTo(float other) =>
+        LengthSquared.CompareTo(other * other);
+
+    #endregion
+
+    #region Static Math
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Vector3 other)
-    {
-        return X.AboutEquals(other.X) &&
-               Y.AboutEquals(other.Y) &&
-               Z.AboutEquals(other.Z);
-    }
+    public static Vector3 Abs(Vector3 vector) =>
+        new(Vector128.Abs(vector.AsVector128()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Vector3 other, float tolerance)
-    {
-        return X.AboutEquals(other.X, tolerance) &&
-               Y.AboutEquals(other.Y, tolerance) &&
-               Y.AboutEquals(other.Z, tolerance);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object? obj)
-    {
-        return obj is Vector3 other && Equals(other);
-    }
+    public static Vector3 Round(Vector3 vector) =>
+        new(Vector128.Round(vector.AsVector128()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(X, Y, Z);
-    }
+    public static Vector3 Floor(Vector3 vector) =>
+        new(Vector128.Floor(vector.AsVector128()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-    {
-        return $"{X}, {Y}, {Z}";
-    }
+    public static Vector3 Ceiling(Vector3 vector) =>
+        new(Vector128.Ceiling(vector.AsVector128()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator +(Vector3 a, Vector3 b)
-    {
-        return new Vector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
-    }
+    public static Vector3 Clamp(Vector3 vector, Vector3 min, Vector3 max) =>
+        new(Vector128.Min(Vector128.Max(vector.AsVector128(), min.AsVector128()), max.AsVector128()));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator +(Vector3 a, Vector2 b)
-    {
-        return new Vector3(a.X + b.X, a.Y + b.Y, a.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator +(Vector3 a, float b)
-    {
-        return new Vector3(a.X + b, a.Y + b, a.Z + b);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator +(float a, Vector3 b)
-    {
-        return new Vector3(a + b.X, a + b.Y, a + b.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator -(Vector3 a)
-    {
-        return new Vector3(-a.X, -a.Y, -a.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator -(Vector3 a, Vector3 b)
-    {
-        return new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
-    }
+    public static float Dot(Vector3 a, Vector3 b) =>
+        Vector128.Dot(a.AsVector128(), b.AsVector128());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator -(Vector3 a, Vector2 b)
-    {
-        return new Vector3(a.X - b.X, a.Y - b.Y, a.Z);
-    }
+    public static float DistanceSquared(Vector3 a, Vector3 b) =>
+        (a - b).LengthSquared;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator -(Vector3 a, float b)
-    {
-        return new Vector3(a.X - b, a.Y - b, a.Z - b);
-    }
+    public static float Distance(Vector3 a, Vector3 b) =>
+        (a - b).Length;
+   
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float DistanceFast(Vector3 a, Vector3 b) =>
+        (a - b).LengthFast;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator -(float a, Vector3 b)
+    public static Vector3 Cross(Vector3 a, Vector3 b)
     {
-        return new Vector3(a - b.X, a - b.Y, a - b.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator *(Vector3 a, Vector3 b)
-    {
-        return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator *(Vector3 a, Vector2 b)
-    {
-        return new Vector3(a.X * b.X, a.Y * b.Y, a.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator *(Vector3 a, float b)
-    {
-        return new Vector3(a.X * b, a.Y * b, a.Z * b);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator *(float a, Vector3 b)
-    {
-        return new Vector3(a * b.X, a * b.Y, a * b.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator /(Vector3 a, Vector3 b)
-    {
-        return new Vector3(a.X / b.X, a.Y / b.Y, a.Z / b.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator /(Vector3 a, Vector2 b)
-    {
-        return new Vector3(a.X / b.X, a.Y / b.Y, a.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator /(Vector3 a, float b)
-    {
-        return new Vector3(a.X / b, a.Y / b, a.Z / b);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator /(float a, Vector3 b)
-    {
-        return new Vector3(a / b.X, a / b.Y, a / b.Z);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Vector3 a, Vector3 b)
-    {
-        return a.Equals(b);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Vector3 a, Vector3 b)
-    {
-        return !a.Equals(b);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float DistanceSquared(Vector3 valueA, Vector3 valueB)
-    {
-        return (valueA - valueB).LengthSquared;
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Distance(Vector3 valueA, Vector3 valueB)
-    {
-        return (valueA - valueB).Length;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Cross(Vector3 valueA, Vector3 valueB)
-    {
+        // TODO: SMID?
         return new Vector3(
-            valueA.Y * valueB.Z - valueA.Z * valueB.Y,
-            valueA.Z * valueB.X - valueA.X * valueB.Z,
-            valueA.X * valueB.Y - valueA.Y * valueB.X);
+            a.Y * b.Z - a.Z * b.Y,
+            a.Z * b.X - a.X * b.Z,
+            a.X * b.Y - a.Y * b.X);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Dot(Vector3 valueA, Vector3 valueB)
-    {
-        return valueA.X * valueB.X + valueA.Y * valueB.Y + valueA.Z * valueB.Z;
-    }
+    #endregion
+
+    #region Operators
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Reflect(Vector3 value, Vector3 normal)
-    {
-        return value - 2.0f * (Dot(value, normal) * normal);
-    }
+    public static bool operator ==(Vector3 a, Vector3 b) => a.AboutEquals(b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 MoveTowards(Vector3 current, Vector3 target, float distance)
-    {
-        return new Vector3(
-            HyperMath.MoveTowards(current.X, target.X, distance),
-            HyperMath.MoveTowards(current.Y, target.Y, distance),
-            HyperMath.MoveTowards(current.Z, target.Z, distance));
-    }
+    public static bool operator !=(Vector3 a, Vector3 b) => !(a == b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Clamp(Vector3 value, Vector3 min, Vector3 max)
-    {
-        return new Vector3(
-            float.Clamp(value.X, min.X, max.X),
-            float.Clamp(value.Y, min.Y, max.Y),
-            float.Clamp(value.Z, min.Z, max.Z));
-    }
+    public static Vector3 operator +(Vector3 a, Vector3 b) => new(a.AsVector128() + b.AsVector128());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator +(Vector3 a, Vector2 b) => a + new Vector3(b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Clamp(Vector3 value, float min, float max)
-    {
-        return new Vector3(
-            float.Clamp(value.X, min, max),
-            float.Clamp(value.Y, min, max),
-            float.Clamp(value.Z, min, max));
-    }
+    public static Vector3 operator +(Vector3 a, Vector128<float> b) => new(a.AsVector128() + b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Lerp(Vector3 value, Vector3 target, float amount)
-    {
-        return new Vector3(
-            float.Lerp(value.X, target.X, amount),
-            float.Lerp(value.Y, target.Y, amount),
-            float.Lerp(value.Z, target.Z, amount));
-    }
+    public static Vector3 operator +(Vector3 a, float b) => a + Vector128.Create(b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Max(Vector3 valueA, Vector3 valueB)
-    {
-        return new Vector3(
-            float.Max(valueA.X, valueB.X),
-            float.Max(valueA.Y, valueB.Y),
-            float.Max(valueA.Z, valueB.Z));
-    }
+    public static Vector3 operator +(float a, Vector3 b) => b + a;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Min(Vector3 valueA, Vector3 valueB)
-    {
-        return new Vector3(
-            float.Min(valueA.X, valueB.X),
-            float.Min(valueA.Y, valueB.Y),
-            float.Min(valueA.Z, valueB.Z));
-    }
+    public static Vector3 operator +(Vector3 a) => a;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator -(Vector3 a, Vector3 b) => new(a.AsVector128() - b.AsVector128());
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator -(Vector3 a, Vector2 b) => a - new Vector3(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator -(Vector3 a, Vector128<float> b) => new(a.AsVector128() - b);
+        
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator -(Vector3 a, float b) => a - Vector128.Create(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator -(float a, Vector3 b) => b - a;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator -(Vector3 a) => new(Vector128.Negate(a.AsVector128()));
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator *(Vector3 a, Vector3 b) => new(a.AsVector128() * b.AsVector128());
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator *(Vector3 a, Vector2 b) => a * new Vector3(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator *(Vector3 a, float b) => new(a.AsVector128() * b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator *(float a, Vector3 b) => b * a;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator /(Vector3 a, Vector3 b) => new(a.AsVector128() / b.AsVector128());
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator /(Vector3 a, Vector2 b) => a / new Vector3(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 operator /(Vector3 a, float b) => new(a.AsVector128() / b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Abs(Vector3 value)
-    {
-        return new Vector3(
-            float.Abs(value.X),
-            float.Abs(value.Y),
-            float.Abs(value.Z));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Round(Vector3 value)
-    {
-        return new Vector3(
-            float.Round(value.X),
-            float.Round(value.Y),
-            float.Round(value.Z));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Round(Vector3 value, int digits)
-    {
-        return new Vector3(
-            float.Round(value.X, digits),
-            float.Round(value.Y, digits),
-            float.Round(value.Z, digits));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Ceiling(Vector3 value)
-    {
-        return new Vector3(
-            float.Ceiling(value.X),
-            float.Ceiling(value.Y),
-            float.Ceiling(value.Z));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Floor(Vector3 value)
-    {
-        return new Vector3(
-            float.Floor(value.X),
-            float.Floor(value.Y),
-            float.Floor(value.Z));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Sign(Vector3 value)
-    {
-        return new Vector3(
-            float.Sign(value.X),
-            float.Sign(value.Y),
-            float.Sign(value.Z));
-    }
+    public static Vector3 operator /(float a, Vector3 b) => new(Vector128.Create(a) / b.AsVector128());
+    
+    #endregion
 }

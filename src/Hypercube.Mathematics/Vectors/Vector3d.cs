@@ -12,37 +12,37 @@ using JetBrains.Annotations;
 namespace Hypercube.Mathematics.Vectors;
 
 /// <summary>
-/// Represents a vector with two double-precision floating-point values.
+/// Represents a vector with three single-precision floating-point values.
 /// Optimized with SIMD.
 /// </summary>
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-[DebuggerDisplay("${ToString()}")]
-public readonly struct Vector2d :
-    IEquatable<Vector2d>,
-    IComparable<Vector2d>,
+[DebuggerDisplay("{ToString()}")]
+public readonly struct Vector3d :
+    IEquatable<Vector3d>,
+    IComparable<Vector3d>,
     IComparable<double>,
     IEnumerable<double>,
-    ISpanFormattable, 
-    IAdditionOperators<Vector2d, Vector2d, Vector2d>,
-    ISubtractionOperators<Vector2d, Vector2d, Vector2d>,
-    IMultiplyOperators<Vector2d, Vector2d, Vector2d>,
-    IMultiplyOperators<Vector2d, double, Vector2d>,
-    IDivisionOperators<Vector2d, Vector2d, Vector2d>,
-    IDivisionOperators<Vector2d, double, Vector2d>,
-    IUnaryPlusOperators<Vector2d, Vector2d>,
-    IUnaryNegationOperators<Vector2d, Vector2d>,
-    IAdditiveIdentity<Vector2d, Vector2d>,
-    IMultiplicativeIdentity<Vector2d, Vector2d>,
-    IEqualityOperators<Vector2d, Vector2d, bool>,
-    IMinMaxValue<Vector2d>
+    ISpanFormattable,
+    IAdditionOperators<Vector3d, Vector3d, Vector3d>,
+    ISubtractionOperators<Vector3d, Vector3d, Vector3d>,
+    IMultiplyOperators<Vector3d, Vector3d, Vector3d>,
+    IMultiplyOperators<Vector3d, double, Vector3d>,
+    IDivisionOperators<Vector3d, Vector3d, Vector3d>,
+    IDivisionOperators<Vector3d, double, Vector3d>,
+    IUnaryPlusOperators<Vector3d, Vector3d>,
+    IUnaryNegationOperators<Vector3d, Vector3d>,
+    IAdditiveIdentity<Vector3d, Vector3d>,
+    IMultiplicativeIdentity<Vector3d, Vector3d>,
+    IEqualityOperators<Vector3d, Vector3d, bool>,
+    IMinMaxValue<Vector3d>
 {
     #region Constants
     
     /// <summary>
     /// The number of components in the vector.
     /// </summary>
-    public const int Dimensionality = 2;
+    public const int Dimensionality = 3;
     
     /// <summary>
     /// A vector where all elements are <see cref="double.NaN"/>.
@@ -50,7 +50,7 @@ public readonly struct Vector2d :
     /// NaN, NaN
     /// </code>
     /// </summary>
-    public static readonly Vector2d NaN = new(double.NaN);
+    public static readonly Vector3d NaN = new(double.NaN);
     
     /// <summary>
     /// A vector where all elements are <see cref="double.PositiveInfinity"/>.
@@ -58,7 +58,7 @@ public readonly struct Vector2d :
     /// PositiveInfinity, PositiveInfinity
     /// </code>
     /// </summary>
-    public static readonly Vector2d PositiveInfinity = new(double.PositiveInfinity);
+    public static readonly Vector3d PositiveInfinity = new(double.PositiveInfinity);
     
     /// <summary>
     /// A vector where all elements are <see cref="double.NegativeInfinity"/>.
@@ -66,15 +66,15 @@ public readonly struct Vector2d :
     /// NegativeInfinity, NegativeInfinity
     /// </code>
     /// </summary>
-    public static readonly Vector2d NegativeInfinity = new(double.NegativeInfinity);
-        
+    public static readonly Vector3d NegativeInfinity = new(double.NegativeInfinity);
+    
     /// <summary>
     /// A vector where all elements are <see cref="double.MaxValue"/>.
     /// <code>
     /// MaxValue, MaxValue
     /// </code>
     /// </summary>
-    public static readonly Vector2d Max = new(double.MaxValue);
+    public static readonly Vector3d Max = new(double.MaxValue);
     
     /// <summary>
     /// A vector where all elements are <see cref="double.MinValue"/>.
@@ -82,66 +82,74 @@ public readonly struct Vector2d :
     /// MinValue, MinValue
     /// </code>
     /// </summary>
-    public static readonly Vector2d Min = new(double.MinValue);
+    public static readonly Vector3d Min = new(double.MinValue);
     
     /// <summary>
     /// A vector where all elements are zero.
     /// <code>
-    /// 0, 0
+    /// 0, 0, 0
     /// </code>
     /// </summary>
-    public static readonly Vector2d Zero = new(0d);
+    public static readonly Vector3d Zero = new(0f);
     
     /// <summary>
     /// A vector where all elements are one.
     /// <code>
-    /// 1, 1
+    /// 1, 1, 1
     /// </code>
     /// </summary>
-    public static readonly Vector2d One = new(1d);
+    public static readonly Vector3d One = new(1f);
     
     /// <summary>
     /// A vector where only X element is one.
     /// <code>
-    /// 1, 0
+    /// 1, 0, 0
     /// </code>
     /// </summary>
-    public static readonly Vector2d UnitX = new(1d, 0d);
+    public static readonly Vector3d UnitX = new(1f, 0f, 0f);
     
     /// <summary>
     /// A vector where only Y element is one.
     /// <code>
-    /// 0, 1
+    /// 0, 1, 0
     /// </code>
     /// </summary>
-    public static readonly Vector2d UnitY = new(0d, 1d);
-
+    public static readonly Vector3d UnitY = new(0f, 1f, 0f);
+    
+    /// <summary>
+    /// A vector where only Z element is one.
+    /// <code>
+    /// 0, 0, 1
+    /// </code>
+    /// </summary>
+    public static readonly Vector3d UnitZ = new(0f, 0f, 1f);
+    
     #endregion
     
-    public static Vector2d AdditiveIdentity
+    public static Vector3d AdditiveIdentity
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Zero;
     }
 
-    public static Vector2d MultiplicativeIdentity
+    public static Vector3d MultiplicativeIdentity
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => One;
     }
 
-    public static Vector2d MinValue
+    public static Vector3d MinValue
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Min;
     }
 
-    public static Vector2d MaxValue
+    public static Vector3d MaxValue
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Max;
     }
-    
+
     #region Fields
     
     /// <summary>
@@ -154,27 +162,32 @@ public readonly struct Vector2d :
     /// </summary>
     public readonly double Y;
     
+    /// <summary>
+    /// The Z component of the vector.
+    /// </summary>
+    public readonly double Z;
+    
     #endregion
-
-    public Vector2d Absolute
+    
+    public Vector3d Absolute
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Abs(this);
     }
 
-    public Vector2d Rounded
+    public Vector3d Rounded
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Round(this);
     }
 
-    public Vector2d Floored
+    public Vector3d Floored
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Floor(this);
     }
 
-    public Vector2d Ceiled
+    public Vector3d Ceiled
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Ceiling(this);
@@ -185,7 +198,7 @@ public readonly struct Vector2d :
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => X / Y;
     }
-
+    
     public double LengthSquared
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -197,20 +210,20 @@ public readonly struct Vector2d :
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => double.Sqrt(LengthSquared);
     }
-    
+
     public double LengthFast
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => 1f / double.ReciprocalSqrtEstimate(LengthSquared);
     }
 
-    public Vector2d Normalized
+    public Vector3d Normalized
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => this / Length;
     }
-    
-    public Vector2d NormalizedFast
+
+    public Vector3d NormalizedFast
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => this / LengthFast;
@@ -219,19 +232,13 @@ public readonly struct Vector2d :
     public double Summation
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => X + Y;
+        get => X + Y + Z;
     }
 
     public double Production
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => X * Y;
-    }
-
-    public double Angle
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => double.Atan2(Y, X);
+        get => X * Y * Z;
     }
 
     public double this[int index]
@@ -239,38 +246,41 @@ public readonly struct Vector2d :
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Get(index);
     }
-    
+
     #region Constructors
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2d(double x, double y)
+    public Vector3d(double x, double y, double z)
     {
         X = x;
         Y = y;
+        Z = z;
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2d(double scalar) : this(scalar, scalar)
+    public Vector3d(double scalar) : this(scalar, scalar, scalar)
     {
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2d(Vector2d vector) : this(vector.X, vector.Y)
+    public Vector3d(Vector3d vector) : this(vector.X, vector.Y, vector.Z)
     {
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2d(Vector64<double> vector)
+    public Vector3d(Vector128<double> vector)
     {
-        this = Unsafe.As<Vector64<double>, Vector2d>(ref vector);
+        this = Unsafe.As<Vector128<double>, Vector3d>(ref vector);
     }
-    
+
     #endregion
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Deconstruct(out double x, out double y)
+    public void Deconstruct(out double x, out double y, out double z)
     {
         x = X;
         y = Y;
+        z = Z;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -281,21 +291,21 @@ public readonly struct Vector2d :
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2d WithX(double value) => new(value, Y);
+    public Vector3d WithX(double value) => new(value, Y, Z);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2d WithY(double value) => new(X, value);
-
-    #region Cast
+    public Vector3d WithY(double value) => new(X, value, Z);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Angle AsAngle() => new(Angle);
+    public Vector3d WithZ(double value) => new(X, Y, value);
+    
+    #region Cast
 
     /// <summary>
     /// Returns a new array containing the vector elements.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double[] AsArray() => [X, Y];
+    public double[] AsArray() => [X, Y, Z];
     
     /// <summary>
     /// Returns a new read-only span containing the vector elements.
@@ -316,179 +326,174 @@ public readonly struct Vector2d :
     public Span<double> AsUnsafeSpan() => MemoryMarshal.CreateSpan(ref Unsafe.AsRef(in X), Dimensionality);
     
     /// <summary>
-    /// Converts this vector to a SIMD Vector64 representation.
+    /// Converts this vector to a SIMD Vector128 representation.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Vector64<double> AsVector64() => Unsafe.As<Vector2d, Vector64<double>>(ref Unsafe.AsRef(in this));
+    private Vector128<double> AsVector128() => Unsafe.As<Vector3d, Vector128<double>>(ref Unsafe.AsRef(in this));
     
     #endregion
-
+    
     #region Equality
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Vector2d other) =>
+    public bool Equals(Vector3d other) =>
         X.Equals(other.X) &&
-        Y.Equals(other.Y);
+        Y.Equals(other.Y) &&
+        Z.Equals(other.Z);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool AboutEquals(Vector2d other, double tolerance = HyperMath.FloatTolerance) =>
+    public bool AboutEquals(Vector3d other, double tolerance = HyperMath.FloatTolerance) =>
         X.AboutEquals(other.X, tolerance) &&
-        Y.AboutEquals(other.Y, tolerance);
+        Y.AboutEquals(other.Y, tolerance) &&
+        Z.AboutEquals(other.Z, tolerance);
 
-    /// <inheritdoc/>
     public override bool Equals(object? obj) =>
-        obj is Vector2d other &&
-        Equals(other);
-    
-    /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        obj is Vector3d other && Equals(other);
+
     public override int GetHashCode() =>
-        HashCode.Combine(X, Y);
+        HashCode.Combine(X, Y, Z);
 
     #endregion
 
-    #region String Formating
-    
-    /// <inheritdoc/>
+    #region Formatting
+
     public override string ToString() =>
         ToString(null, CultureInfo.InvariantCulture);
-    
-    /// <inheritdoc/>
-    public string ToString(string? format, IFormatProvider? formatProvider) =>
-        $"{X.ToString(format, formatProvider)}, {Y.ToString(format, formatProvider)}";
-    
-    /// <inheritdoc/>
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format,
-        IFormatProvider? provider) => destination.TryWrite(provider, $"{X}, {Y}", out charsWritten);
-    
+
+    public string ToString(string? format, IFormatProvider? provider) =>
+        $"{X.ToString(format, provider)}, {Y.ToString(format, provider)}, {Z.ToString(format, provider)}";
+
+    public bool TryFormat(Span<char> destination, out int charsWritten,
+        ReadOnlySpan<char> format, IFormatProvider? provider) =>
+        destination.TryWrite(provider, $"{X}, {Y}, {Z}", out charsWritten);
+
     #endregion
 
     #region IEnumerable
-    
-    /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public IEnumerator<double> GetEnumerator()
     {
         yield return X;
         yield return Y;
+        yield return Z;
     }
-    
+
     #endregion
 
-    #region Comparation
+    #region Comparison
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int CompareTo(Vector2d other) => LengthSquared.CompareTo(other.LengthSquared);
+    public int CompareTo(Vector3d other) =>
+        LengthSquared.CompareTo(other.LengthSquared);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int CompareTo(double other) => LengthSquared.CompareTo(other * other);
+    public int CompareTo(double other) =>
+        LengthSquared.CompareTo(other * other);
 
     #endregion
 
     #region Static Math
-        
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d Abs(Vector2d vector) =>
-        new(Vector64.Abs(vector.AsVector64()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d Round(Vector2d vector) =>
-        new(Vector64.Round(vector.AsVector64()));
+    public static Vector3d Abs(Vector3d vector) =>
+        new(Vector128.Abs(vector.AsVector128()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d Floor(Vector2d vector) =>
-        new(Vector64.Floor(vector.AsVector64()));
+    public static Vector3d Round(Vector3d vector) =>
+        new(Vector128.Round(vector.AsVector128()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d Ceiling(Vector2d vector) =>
-        new(Vector64.Ceiling(vector.AsVector64()));
+    public static Vector3d Floor(Vector3d vector) =>
+        new(Vector128.Floor(vector.AsVector128()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d Clamp(Vector2d vector, Vector2d min, Vector2d max) =>
-        new(Vector64.Min(Vector64.Max(vector.AsVector64(), min.AsVector64()), max.AsVector64()));
+    public static Vector3d Ceiling(Vector3d vector) =>
+        new(Vector128.Ceiling(vector.AsVector128()));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d Clamp(Vector3d vector, Vector3d min, Vector3d max) =>
+        new(Vector128.Min(Vector128.Max(vector.AsVector128(), min.AsVector128()), max.AsVector128()));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double Dot(Vector2d a, Vector2d b) =>
-        Vector64.Dot(a.AsVector64(), b.AsVector64());
+    public static double Dot(Vector3d a, Vector3d b) =>
+        Vector128.Dot(a.AsVector128(), b.AsVector128());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double DistanceSquared(Vector2d a, Vector2d b) =>
+    public static double DistanceSquared(Vector3d a, Vector3d b) =>
         (a - b).LengthSquared;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double Distance(Vector2d a, Vector2d b) =>
+    public static double Distance(Vector3d a, Vector3d b) =>
         (a - b).Length;
    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double DistanceFast(Vector2d a, Vector2d b) =>
+    public static double DistanceFast(Vector3d a, Vector3d b) =>
         (a - b).LengthFast;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d Reflect(Vector2d v, Vector2d n) =>
-        v - 2f * Dot(v, n) * n;
+    public static Vector3d Cross(Vector3d a, Vector3d b)
+    {
+        // TODO: SMID?
+        return new Vector3d(
+            a.Y * b.Z - a.Z * b.Y,
+            a.Z * b.X - a.X * b.Z,
+            a.X * b.Y - a.Y * b.X);
+    }
 
     #endregion
 
     #region Operators
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Vector2d a, Vector2d b) => a.AboutEquals(b);
+    public static bool operator ==(Vector3d a, Vector3d b) => a.AboutEquals(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Vector3d a, Vector3d b) => !(a == b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator +(Vector3d a, Vector3d b) => new(a.AsVector128() + b.AsVector128());
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator +(Vector3d a, Vector128<double> b) => new(a.AsVector128() + b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator +(Vector3d a, double b) => a + Vector128.Create(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator +(double a, Vector3d b) => b + a;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Vector2d a, Vector2d b) => !(a == b);
+    public static Vector3d operator +(Vector3d a) => a;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator -(Vector3d a, Vector3d b) => new(a.AsVector128() - b.AsVector128());
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator -(Vector3d a, Vector128<double> b) => new(a.AsVector128() - b);
+        
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator -(Vector3d a, double b) => a - Vector128.Create(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator -(double a, Vector3d b) => b - a;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator -(Vector3d a) => new(Vector128.Negate(a.AsVector128()));
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator *(Vector3d a, Vector3d b) => new(a.AsVector128() * b.AsVector128());
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator *(Vector3d a, double b) => new(a.AsVector128() * b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator *(double a, Vector3d b) => b * a;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator /(Vector3d a, Vector3d b) => new(a.AsVector128() / b.AsVector128());
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3d operator /(Vector3d a, double b) => new(a.AsVector128() / b);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator +(Vector2d a, Vector2d b) => new(a.AsVector64() + b.AsVector64());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator +(Vector2d a, Vector64<double> b) => new(a.AsVector64() + b);
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator +(Vector2d a, double b) => a + Vector64.Create(b);
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator +(double a, Vector2d b) => b + a;
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator +(Vector2d a) => a;
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator -(Vector2d a, Vector2d b) => new(a.AsVector64() - b.AsVector64());
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator -(Vector2d a, Vector64<double> b) => new(a.AsVector64() - b);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator -(Vector2d a, double b) => a - Vector64.Create(b);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator -(double a, Vector2d b) => b - a;
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator -(Vector2d a) => new(Vector64.Negate(a.AsVector64()));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator *(Vector2d a, Vector2d b) => new(a.AsVector64() * b.AsVector64());
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator *(Vector2d a, double b) => new(a.AsVector64() * b);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator *(double a, Vector2d b) => b * a;
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator /(Vector2d a, Vector2d b) => new(a.AsVector64() / b.AsVector64());
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2d operator /(Vector2d a, double b) => new(a.AsVector64() / b);
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Vector2d((double x, double y) a) => new(a.x, a.y);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator (double x, double y)(Vector2d a) => (a.X, a.Y);
-    
     #endregion
 }

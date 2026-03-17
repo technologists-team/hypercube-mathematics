@@ -11,38 +11,34 @@ using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics.Vectors;
 
-/// <summary>
-/// Represents a vector with two single-precision floating-point values.
-/// Optimized with SIMD.
-/// </summary>
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [DebuggerDisplay("{ToString()}")]
-public readonly struct Vector2 :
-    IEquatable<Vector2>,
-    IComparable<Vector2>,
+public readonly struct Vector5 :
+    IEquatable<Vector5>,
+    IComparable<Vector5>,
     IComparable<float>,
     IEnumerable<float>,
-    ISpanFormattable, 
-    IAdditionOperators<Vector2, Vector2, Vector2>,
-    ISubtractionOperators<Vector2, Vector2, Vector2>,
-    IMultiplyOperators<Vector2, Vector2, Vector2>,
-    IMultiplyOperators<Vector2, float, Vector2>,
-    IDivisionOperators<Vector2, Vector2, Vector2>,
-    IDivisionOperators<Vector2, float, Vector2>,
-    IUnaryPlusOperators<Vector2, Vector2>,
-    IUnaryNegationOperators<Vector2, Vector2>,
-    IAdditiveIdentity<Vector2, Vector2>,
-    IMultiplicativeIdentity<Vector2, Vector2>,
-    IEqualityOperators<Vector2, Vector2, bool>,
-    IMinMaxValue<Vector2>
+    ISpanFormattable,
+    IAdditionOperators<Vector5, Vector5, Vector5>,
+    ISubtractionOperators<Vector5, Vector5, Vector5>,
+    IMultiplyOperators<Vector5, Vector5, Vector5>,
+    IMultiplyOperators<Vector5, float, Vector5>,
+    IDivisionOperators<Vector5, Vector5, Vector5>,
+    IDivisionOperators<Vector5, float, Vector5>,
+    IUnaryPlusOperators<Vector5, Vector5>,
+    IUnaryNegationOperators<Vector5, Vector5>,
+    IAdditiveIdentity<Vector5, Vector5>,
+    IMultiplicativeIdentity<Vector5, Vector5>,
+    IEqualityOperators<Vector5, Vector5, bool>,
+    IMinMaxValue<Vector5>
 {
     #region Constants
     
     /// <summary>
     /// The number of components in the vector.
     /// </summary>
-    public const int Dimensionality = 2;
+    public const int Dimensionality = 5;
     
     /// <summary>
     /// A vector where all elements are <see cref="float.NaN"/>.
@@ -50,7 +46,7 @@ public readonly struct Vector2 :
     /// NaN, NaN
     /// </code>
     /// </summary>
-    public static readonly Vector2 NaN = new(float.NaN);
+    public static readonly Vector5 NaN = new(float.NaN);
     
     /// <summary>
     /// A vector where all elements are <see cref="float.PositiveInfinity"/>.
@@ -58,7 +54,7 @@ public readonly struct Vector2 :
     /// PositiveInfinity, PositiveInfinity
     /// </code>
     /// </summary>
-    public static readonly Vector2 PositiveInfinity = new(float.PositiveInfinity);
+    public static readonly Vector5 PositiveInfinity = new(float.PositiveInfinity);
     
     /// <summary>
     /// A vector where all elements are <see cref="float.NegativeInfinity"/>.
@@ -66,7 +62,7 @@ public readonly struct Vector2 :
     /// NegativeInfinity, NegativeInfinity
     /// </code>
     /// </summary>
-    public static readonly Vector2 NegativeInfinity = new(float.NegativeInfinity);
+    public static readonly Vector5 NegativeInfinity = new(float.NegativeInfinity);
     
     /// <summary>
     /// A vector where all elements are <see cref="float.MaxValue"/>.
@@ -74,7 +70,7 @@ public readonly struct Vector2 :
     /// MaxValue, MaxValue
     /// </code>
     /// </summary>
-    public static readonly Vector2 Max = new(float.MaxValue);
+    public static readonly Vector5 Max = new(float.MaxValue);
     
     /// <summary>
     /// A vector where all elements are <see cref="float.MinValue"/>.
@@ -82,61 +78,77 @@ public readonly struct Vector2 :
     /// MinValue, MinValue
     /// </code>
     /// </summary>
-    public static readonly Vector2 Min = new(float.MinValue);
+    public static readonly Vector5 Min = new(float.MinValue);
     
     /// <summary>
     /// A vector where all elements are zero.
     /// <code>
-    /// 0, 0
+    /// 0, 0, 0, 0
     /// </code>
     /// </summary>
-    public static readonly Vector2 Zero = new(0f);
+    public static readonly Vector5 Zero = new(0f);
     
     /// <summary>
     /// A vector where all elements are one.
     /// <code>
-    /// 1, 1
+    /// 1, 1, 1, 1
     /// </code>
     /// </summary>
-    public static readonly Vector2 One = new(1f);
+    public static readonly Vector5 One = new(1f);
     
     /// <summary>
     /// A vector where only X element is one.
     /// <code>
-    /// 1, 0
+    /// 1, 0, 0, 0
     /// </code>
     /// </summary>
-    public static readonly Vector2 UnitX = new(1f, 0f);
+    public static readonly Vector5 UnitX = new(1f, 0f, 0f, 0f, 0f);
     
     /// <summary>
     /// A vector where only Y element is one.
     /// <code>
-    /// 0, 1
+    /// 0, 1, 0, 0
     /// </code>
     /// </summary>
-    public static readonly Vector2 UnitY = new(0f, 1f);
+    public static readonly Vector5 UnitY = new(0f, 1f, 0f, 0f, 0f);
+    
+    /// <summary>
+    /// A vector where only Z element is one.
+    /// <code>
+    /// 0, 0, 1, 0
+    /// </code>
+    /// </summary>
+    public static readonly Vector5 UnitZ = new(0f, 0f, 1f, 0f, 0f);
+    
+    /// <summary>
+    /// A vector where only Z element is one.
+    /// <code>
+    /// 0, 0, 1, 0
+    /// </code>
+    /// </summary>
+    public static readonly Vector5 UnitW = new(0f, 0f, 0f, 1f, 0f);    
     
     #endregion
     
-    public static Vector2 AdditiveIdentity
+    public static Vector5 AdditiveIdentity
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Zero;
     }
 
-    public static Vector2 MultiplicativeIdentity
+    public static Vector5 MultiplicativeIdentity
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => One;
     }
 
-    public static Vector2 MinValue
+    public static Vector5 MinValue
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Min;
     }
 
-    public static Vector2 MaxValue
+    public static Vector5 MaxValue
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Max;
@@ -154,38 +166,47 @@ public readonly struct Vector2 :
     /// </summary>
     public readonly float Y;
     
+    /// <summary>
+    /// The Z component of the vector.
+    /// </summary>
+    public readonly float Z;
+    
+    /// <summary>
+    /// The W component of the vector.
+    /// </summary>
+    public readonly float W;
+    
+    /// <summary>
+    /// The V component of the vector.
+    /// </summary>
+    public readonly float V;
+    
     #endregion
 
-    public Vector2 Absolute
+    public Vector5 Absolute
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Abs(this);
     }
 
-    public Vector2 Rounded
+    public Vector5 Rounded
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Round(this);
     }
 
-    public Vector2 Floored
+    public Vector5 Floored
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Floor(this);
     }
 
-    public Vector2 Ceiled
+    public Vector5 Ceiled
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Ceiling(this);
     }
-
-    public float AspectRatio
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => X / Y;
-    }
-
+    
     public float LengthSquared
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -197,96 +218,106 @@ public readonly struct Vector2 :
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => float.Sqrt(LengthSquared);
     }
-    
+
     public float LengthFast
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => 1f / float.ReciprocalSqrtEstimate(LengthSquared);
     }
 
-    public Vector2 Normalized
+    public Vector5 Normalized
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => this / Length;
     }
-    
-    public Vector2 NormalizedFast
+
+    public Vector5 NormalizedFast
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => this / LengthFast;
     }
-
-    public float Summation
+    
+    public Vector2 Xy
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => X + Y;
+        get => new(X, Y);
     }
-
-    public float Production
+    
+    public Vector3 Xyz
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => X * Y;
+        get => new(X, Y, Z);
     }
-
-    public float Angle
+    
+    public Vector4 Xyzw
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => float.Atan2(Y, X);
+        get => new(X, Y, Z, W);
     }
-
+    
     public float this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => Get(index);
     }
-    
+
     #region Constructors
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2(float x, float y)
+    public Vector5(float x, float y, float z, float w, float v)
     {
         X = x;
         Y = y;
+        Z = z;
+        W = w;
+        V = v;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2(double x, double y) : this((float) x, (float) y)
+    public Vector5(double x, double y, double z, double w, double v) : this((float) x, (float) y, (float) z, (float) w, (float) v)
     {
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2(float scalar) : this(scalar, scalar)
+    public Vector5(float scalar) : this(scalar, scalar, scalar, scalar, scalar)
     {
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2(double scalar) : this((float) scalar)
+    public Vector5(double scalar) : this((float) scalar)
     {
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2(Vector2 vector) : this(vector.X, vector.Y)
+    public Vector5(Vector3 vector, float w = 0, float v = 0) : this(vector.X, vector.Y, vector.Z, w, v)
     {
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2(Vector2d vector) : this(vector.X, vector.Y)
+    public Vector5(Vector4 vector, float v = 0) : this(vector.X, vector.Y, vector.Z, vector.W, v)
     {
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2(Vector64<float> vector)
+    public Vector5(Vector5 vector) : this(vector.X, vector.Y, vector.Z, vector.W, vector.V)
     {
-        this = Unsafe.As<Vector64<float>, Vector2>(ref vector);
     }
-    
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector5(Vector512<float> vector)
+    {
+        this = Unsafe.As<Vector512<float>, Vector5>(ref vector);
+    }
+
     #endregion
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Deconstruct(out float x, out float y)
+    public void Deconstruct(out float x, out float y, out float z, out float w)
     {
         x = X;
         y = Y;
+        z = Z;
+        w = W;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -297,21 +328,27 @@ public readonly struct Vector2 :
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2 WithX(float value) => new(value, Y);
+    public Vector5 WithX(float value) => new(value, Y, Z, W, V);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2 WithY(float value) => new(X, value);
-
-    #region Cast
+    public Vector5 WithY(float value) => new(X, value, Z, W, V);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Angle AsAngle() => new(Angle);
+    public Vector5 WithZ(float value) => new(X, Y, value, W, V);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector5 WithW(float value) => new(X, Y, Z, value, V);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector5 WithV(float value) => new(X, Y, Z, W, value);
+    
+    #region Cast
+    
     /// <summary>
     /// Returns a new array containing the vector elements.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float[] AsArray() => [X, Y];
+    public float[] AsArray() => [X, Y, Z, W, V];
     
     /// <summary>
     /// Returns a new read-only span containing the vector elements.
@@ -332,186 +369,175 @@ public readonly struct Vector2 :
     public Span<float> AsUnsafeSpan() => MemoryMarshal.CreateSpan(ref Unsafe.AsRef(in X), Dimensionality);
     
     /// <summary>
-    /// Converts this vector to a SIMD Vector64 representation.
+    /// Converts this vector to a SIMD Vector128 representation.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Vector64<float> AsVector64() => Unsafe.As<Vector2, Vector64<float>>(ref Unsafe.AsRef(in this));
+    private Vector512<float> AsVector512() => Unsafe.As<Vector5, Vector512<float>>(ref Unsafe.AsRef(in this));
     
     #endregion
-
+    
     #region Equality
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Vector2 other) =>
+    public bool Equals(Vector5 other) =>
         X.Equals(other.X) &&
-        Y.Equals(other.Y);
+        Y.Equals(other.Y) &&
+        Z.Equals(other.Z) &&
+        W.Equals(other.W) &&
+        V.Equals(other.V);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool AboutEquals(Vector2 other, float tolerance = HyperMath.FloatTolerance) =>
+    public bool AboutEquals(Vector5 other, float tolerance = HyperMath.FloatTolerance) =>
         X.AboutEquals(other.X, tolerance) &&
-        Y.AboutEquals(other.Y, tolerance);
+        Y.AboutEquals(other.Y, tolerance) &&
+        Z.AboutEquals(other.Z, tolerance) &&
+        W.AboutEquals(other.W, tolerance) &&
+        V.AboutEquals(other.V, tolerance);
 
-    /// <inheritdoc/>
     public override bool Equals(object? obj) =>
-        obj is Vector2 other &&
-        Equals(other);
-    
-    /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        obj is Vector5 other && Equals(other);
+
     public override int GetHashCode() =>
-        HashCode.Combine(X, Y);
+        HashCode.Combine(X, Y, Z, W, V);
 
     #endregion
-
-    #region String Formating
     
-    /// <inheritdoc/>
+    #region Formatting
+
     public override string ToString() =>
         ToString(null, CultureInfo.InvariantCulture);
-    
-    /// <inheritdoc/>
-    public string ToString(string? format, IFormatProvider? formatProvider) =>
-        $"{X.ToString(format, formatProvider)}, {Y.ToString(format, formatProvider)}";
-    
-    /// <inheritdoc/>
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format,
-        IFormatProvider? provider) => destination.TryWrite(provider, $"{X}, {Y}", out charsWritten);
-    
-    #endregion
 
-    #region IEnumerable
+    public string ToString(string? format, IFormatProvider? provider) =>
+        $"{X.ToString(format, provider)}, {Y.ToString(format, provider)}, {Z.ToString(format, provider)}";
+
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) =>
+        destination.TryWrite(provider, $"{X}, {Y}, {Z}, {W}, {V}", out charsWritten);
+
+    #endregion
     
-    /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    #region IEnumerable
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public IEnumerator<float> GetEnumerator()
     {
         yield return X;
         yield return Y;
+        yield return Z;
+        yield return W;
+        yield return V;
     }
-    
-    #endregion
-
-    #region Comparation
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int CompareTo(Vector2 other) => LengthSquared.CompareTo(other.LengthSquared);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int CompareTo(float other) => LengthSquared.CompareTo(other * other);
 
     #endregion
 
-    #region Math
+    #region Comparison
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2 Clamp(Vector2 min, Vector2 max) => Clamp(this, min, max);
+    public int CompareTo(Vector5 other) =>
+        LengthSquared.CompareTo(other.LengthSquared);
+
+    public int CompareTo(float other) =>
+        LengthSquared.CompareTo(other * other);
 
     #endregion
     
     #region Static Math
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Abs(Vector2 vector) =>
-        new(Vector64.Abs(vector.AsVector64()));
+    public static Vector5 Abs(Vector5 vector) =>
+        new(Vector512.Abs(vector.AsVector512()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Round(Vector2 vector) =>
-        new(Vector64.Round(vector.AsVector64()));
+    public static Vector5 Floor(Vector5 vector) =>
+        new(Vector512.Floor(vector.AsVector512()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Floor(Vector2 vector) =>
-        new(Vector64.Floor(vector.AsVector64()));
+    public static Vector5 Ceiling(Vector5 vector) =>
+        new(Vector512.Ceiling(vector.AsVector512()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Ceiling(Vector2 vector) =>
-        new(Vector64.Ceiling(vector.AsVector64()));
+    public static Vector5 Round(Vector5 vector) =>
+        new(Vector512.Round(vector.AsVector512()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Clamp(Vector2 vector, Vector2 min, Vector2 max) =>
-        new(Vector64.Min(Vector64.Max(vector.AsVector64(), min.AsVector64()), max.AsVector64()));
+    public static Vector5 Clamp(Vector5 vector, Vector5 min, Vector5 max) =>
+        new(Vector512.Min(Vector512.Max(vector.AsVector512(), min.AsVector512()), max.AsVector512()));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Dot(Vector2 a, Vector2 b) =>
-        Vector64.Dot(a.AsVector64(), b.AsVector64());
-
+    public static float Dot(Vector5 a, Vector5 b) =>
+        Vector512.Dot(a.AsVector512(), b.AsVector512());
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float DistanceSquared(Vector2 a, Vector2 b) =>
+    public static float DistanceSquared(Vector5 a, Vector5 b) =>
         (a - b).LengthSquared;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Distance(Vector2 a, Vector2 b) =>
+    public static float Distance(Vector5 a, Vector5 b) =>
         (a - b).Length;
    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float DistanceFast(Vector2 a, Vector2 b) =>
+    public static float DistanceFast(Vector5 a, Vector5 b) =>
         (a - b).LengthFast;
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Reflect(Vector2 v, Vector2 n) =>
-        v - 2f * Dot(v, n) * n;
-
     #endregion
-
+    
     #region Operators
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Vector2 a, Vector2 b) => a.AboutEquals(b);
+    public static bool operator ==(Vector5 a, Vector5 b) => a.AboutEquals(b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Vector2 a, Vector2 b) => !(a == b);
+    public static bool operator !=(Vector5 a, Vector5 b) => !(a == b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator +(Vector2 a, Vector2 b) => new(a.AsVector64() + b.AsVector64());
+    public static Vector5 operator +(Vector5 a, Vector5 b) => new(a.AsVector512() + b.AsVector512());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator +(Vector2 a, Vector64<float> b) => new(a.AsVector64() + b);
+    public static Vector5 operator +(Vector5 a, Vector512<float> b) => new(a.AsVector512() + b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator +(Vector2 a, float b) => a + Vector64.Create(b);
+    public static Vector5 operator +(Vector5 a, float b) => a + Vector512.Create(b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator +(float a, Vector2 b) => b + a;
+    public static Vector5 operator +(float a, Vector5 b) => b + a;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator +(Vector2 a) => a;
+    public static Vector5 operator +(Vector5 a) => a;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator -(Vector2 a, Vector2 b) => new(a.AsVector64() - b.AsVector64());
+    public static Vector5 operator -(Vector5 a, Vector5 b) => new(a.AsVector512() - b.AsVector512());
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator -(Vector2 a, Vector64<float> b) => new(a.AsVector64() - b);
+    public static Vector5 operator -(Vector5 a, Vector512<float> b) => new(a.AsVector512() - b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator -(Vector2 a, float b) => a - Vector64.Create(b);
+    public static Vector5 operator -(Vector5 a, float b) => a - Vector512.Create(b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator -(float a, Vector2 b) => b - a;
+    public static Vector5 operator -(float a, Vector5 b) => b - a;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator -(Vector2 a) => new(Vector64.Negate(a.AsVector64()));
+    public static Vector5 operator -(Vector5 a) => new(Vector512.Negate(a.AsVector512()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator *(Vector2 a, Vector2 b) => new(a.AsVector64() * b.AsVector64());
+    public static Vector5 operator *(Vector5 a, Vector5 b) => new(a.AsVector512() * b.AsVector512());
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator *(Vector2 a, float b) => new(a.AsVector64() * b);
+    public static Vector5 operator *(Vector5 a, float b) => new(a.AsVector512() * b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator *(float a, Vector2 b) => b * a;
+    public static Vector5 operator *(float a, Vector5 b) => b * a;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator /(Vector2 a, Vector2 b) => new(a.AsVector64() / b.AsVector64());
+    public static Vector5 operator /(Vector5 a, Vector5 b) => new(a.AsVector512() / b.AsVector512());
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator /(Vector2 a, float b) => new(a.AsVector64() / b);
+    public static Vector5 operator /(Vector5 a, float b) => new(a.AsVector512() / b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Vector2((float x, float y) a) => new(a.x, a.y);
+    public static implicit operator Vector5((float x, float y, float z, float w, float v) a) => new(a.x, a.y, a.z, a.w, a.v);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator (float x, float y)(Vector2 a) => (a.X, a.Y);
+    public static implicit operator (float x, float y, float z, float w, float v)(Vector5 a) => (a.X, a.Y, a.Z, a.W, a.V);
 
     #endregion
 }
