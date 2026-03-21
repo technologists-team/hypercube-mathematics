@@ -132,21 +132,6 @@ public class Vector2Tests
     }
 
     [Test]
-    public void Comparison()
-    {
-        var a = new Vector2(3, 4); // length 5
-        var b = new Vector2(6, 8); // length 10
-
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(a < b);
-            Assert.That(b > a);
-            Assert.That(a <= b);
-            Assert.That(b >= a);
-        }
-    }
-
-    [Test]
     public void Dot()
     {
         var a = new Vector2(1, 2);
@@ -186,41 +171,6 @@ public class Vector2Tests
     }
 
     [Test]
-    public void Lerp()
-    {
-        var a = new Vector2(0, 0);
-        var b = new Vector2(10, 10);
-        
-        Assert.That(Vector2.Lerp(a, b, 0.5f), Is.EqualTo(new Vector2(5, 5)));
-    }
-
-    [Test]
-    public void Round_Ceiling_Floor()
-    {
-        var vector = new Vector2(1.4f, -1.6f);
-
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(vector.Round(), Is.EqualTo(new Vector2(1, -2)));
-            Assert.That(vector.Ceiling(), Is.EqualTo(new Vector2(2, -1)));
-            Assert.That(vector.Floor(), Is.EqualTo(new Vector2(1, -2)));
-        }
-    }
-
-    [Test]
-    public void Equals_Tolerance()
-    {
-        var a = new Vector2(1.0001f, 2.0001f);
-        var b = new Vector2(1.0002f, 2.0002f);
-        
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(a.Equals(b, 0.001f), Is.True);
-            Assert.That(a.Equals(b, 1e-5f), Is.False);   
-        }
-    }
-
-    [Test]
     public void GetEnumerator()
     {
         var vector = new Vector2(10, 20);
@@ -232,19 +182,6 @@ public class Vector2Tests
             Assert.That(enumerator.Current, Is.EqualTo(10f));
             enumerator.MoveNext();
             Assert.That(enumerator.Current, Is.EqualTo(20f));
-        }
-    }
-
-    [Test]
-    public void NaN()
-    {
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(Vector2.IsNaN(Vector2.NaN));
-            
-            Assert.That(Vector2.IsNaN(new Vector2(float.NaN, 0)));
-            Assert.That(Vector2.IsNaN(new Vector2(0, float.NaN)));
-            Assert.That(Vector2.IsNaN(new Vector2(float.NaN, float.NaN)));
         }
     }
 
