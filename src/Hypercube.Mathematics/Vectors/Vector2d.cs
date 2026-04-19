@@ -483,7 +483,13 @@ public readonly struct Vector2d :
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator /(Vector2d a, double b) => new(a.AsVector64() / b);
-    
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector2(Vector2d vector) => new(vector.X, vector.Y);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector2i(Vector2d vector) => new((int) vector.X, (int) vector.Y);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2d((double x, double y) a) => new(a.x, a.y);
 
