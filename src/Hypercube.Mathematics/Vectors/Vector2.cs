@@ -210,6 +210,16 @@ public readonly struct Vector2 :
         get => this / Length;
     }
     
+    public (float, Vector2) LengthNormalized
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get
+        {
+            var length = Length;
+            return (length, this / length);
+        }
+    }
+    
     public Vector2 NormalizedFast
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -339,6 +349,74 @@ public readonly struct Vector2 :
     
     #endregion
 
+    #region Transformation
+
+    /// <summary>
+    /// Rotate vector CCW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Rotate(float angle)
+        => Rotate(float.Cos(angle), float.Sin(angle));
+
+    /// <summary>
+    /// Rotate vector CCW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Rotate(Angle angle)
+        => Rotate((float) angle.Cos, (float) angle.Sin);
+
+    /// <summary>
+    /// Rotate vector CCW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Rotate(Vector2Angle vector)
+        => Rotate(vector.Cos, vector.Sin);
+    
+    /// <summary>
+    /// Rotate vector CCW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Rotate(float cos, float sin)
+    {
+        // [ cos; -sin ]
+        // [ sin;  cos ]
+        return new Vector2(X * cos - Y * sin, X * sin + Y * cos);
+    }
+
+    /// <summary>
+    /// Rotate vector CW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 InvRotate(float angle)
+        => InvRotate(float.Cos(angle), float.Sin(angle));
+
+    /// <summary>
+    /// Rotate vector CW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 InvRotate(Angle angle)
+        => InvRotate((float) angle.Cos, (float) angle.Sin);
+
+    /// <summary>
+    /// Rotate vector CW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 InvRotate(Vector2Angle vector)
+        => InvRotate(vector.Cos, vector.Sin);
+    
+    /// <summary>
+    /// Rotate vector CW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 InvRotate(float cos, float sin)
+    {
+        // [  cos; sin ]
+        // [ -sin; cos ]
+        return new Vector2(X * cos + Y * sin, Y * cos - X * sin);
+    }
+
+    #endregion
+    
     #region Equality
         
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -452,6 +530,10 @@ public readonly struct Vector2 :
     public static Vector2 Reflect(Vector2 v, Vector2 n) =>
         v - 2f * Dot(v, n) * n;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
+        => new(Vector64.Lerp(a.AsVector64(), b.AsVector64(), Vector64.Create(t)));
+    
     #endregion
 
     #region Operators
