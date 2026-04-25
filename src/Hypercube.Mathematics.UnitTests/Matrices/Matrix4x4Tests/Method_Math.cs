@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Hypercube.Mathematics.Matrices;
-using Hypercube.Mathematics.Vectors;
 
 namespace Hypercube.Mathematics.UnitTests.Matrices.Matrix4x4Tests;
 

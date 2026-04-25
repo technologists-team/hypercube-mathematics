@@ -24,7 +24,25 @@ public readonly struct Angle : IEquatable<Angle>, IEquatable<double>, IComparabl
     public Vector2 Vector
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(double.Cos(Theta), double.Sin(Theta));
+        get => new(Cos, Sin);
+    }
+    
+    public Vector2Angle VectorAngle
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(Cos, Sin);
+    }
+    
+    public double Cos
+    {        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => double.Cos(Theta);
+    }
+
+    public double Sin
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => double.Sin(Theta);
     }
 
     public Angle(double theta)
