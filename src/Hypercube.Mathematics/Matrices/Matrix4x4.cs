@@ -1091,16 +1091,6 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
             0,          0,           0,                                 1 // Row 3
         );
     }
-
-    public static Matrix4x4 CreateOrthographicTopLeft(float width, float height, float zNear, float zFar)
-    {
-        return new Matrix4x4(
-            2f / width,  0,           0,           -1f,   // строка 0
-            0,           2f / height, 0,            1f,   // строка 1
-            0,           0,          -2f / (zFar - zNear), -(zFar + zNear) / (zFar - zNear), // строка 2
-            0,           0,           0,            1f    // строка 3
-        );
-    }
     
     /// <summary>
     /// Creates a perspective projection matrix (OpenGL convention).
