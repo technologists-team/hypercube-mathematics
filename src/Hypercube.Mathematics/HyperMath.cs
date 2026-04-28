@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using Hypercube.Mathematics.Vectors;
+using JetBrains.Annotations;
 
 namespace Hypercube.Mathematics;
 
@@ -225,4 +226,37 @@ public static class HyperMath
             double.Min(current + distance, target) :
             double.Max(current - distance, target);
     }
+    
+    public static Vector2 MoveTowards(Vector2 current, Vector2 target, float distance) => new(
+        MoveTowards(current.X, target.X, distance),
+        MoveTowards(current.Y, target.Y, distance)
+    );
+    
+    public static Vector2i MoveTowards(Vector2i current, Vector2i target, int distance) => new(
+        MoveTowards(current.X, target.X, distance),
+        MoveTowards(current.Y, target.Y, distance)
+    );
+    
+    public static Vector2d MoveTowards(Vector2d current, Vector2d target, double distance) => new(
+        MoveTowards(current.X, target.X, distance),
+        MoveTowards(current.Y, target.Y, distance)
+    );
+    
+    public static Vector3 MoveTowards(Vector3 current, Vector3 target, float distance) => new(
+        MoveTowards(current.X, target.X, distance),
+        MoveTowards(current.Y, target.Y, distance),
+        MoveTowards(current.Z, target.Z, distance)
+    );
+    
+    public static Vector3i MoveTowards(Vector3i current, Vector3i target, int distance) => new(
+        MoveTowards(current.X, target.X, distance),
+        MoveTowards(current.Y, target.Y, distance),
+        MoveTowards(current.Z, target.Z, distance)
+    );
+    
+    public static Vector3d MoveTowards(Vector3d current, Vector3d target, double distance) => new(
+        MoveTowards(current.X, target.X, distance),
+        MoveTowards(current.Y, target.Y, distance),
+        MoveTowards(current.Z, target.Z, distance)
+    );
 }
