@@ -591,9 +591,33 @@ public readonly struct Vector2 :
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2((float x, float y) a) => new(a.x, a.y);
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator (float x, float y)(Vector2 a) => (a.X, a.Y);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector2i(Vector2 a) => new((int) a.X, (int) a.Y);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector2d(Vector2 a) => new(a.X, a.Y);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector2Angle(Vector2 a) => new(a.X, a.Y);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector3(Vector2 a) => new(a);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector3i(Vector2 a) => new((int) a.X, (int) a.Y, 0);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector3d(Vector2 a) => new(a.X, a.Y, 0);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector4(Vector2 a) => new(a);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector5(Vector2 a) => new(a);
+    
     #endregion
 }

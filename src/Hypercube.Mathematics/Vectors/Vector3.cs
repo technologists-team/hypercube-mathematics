@@ -274,7 +274,7 @@ public readonly struct Vector3 :
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector3(double scalar) : this((float)scalar)
+    public Vector3(double scalar) : this((float) scalar)
     {
     }
     
