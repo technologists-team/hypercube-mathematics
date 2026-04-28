@@ -214,7 +214,7 @@ public readonly struct Quaternion : IEquatable<Quaternion>
             // Singularity at North Pole
             return new Vector3(
                 0,
-                HyperMath.PIOver2F,
+                HyperMath.PiOver2F,
                 2f * float.Atan2(quaternion.X, quaternion.W)
             );
 
@@ -222,7 +222,7 @@ public readonly struct Quaternion : IEquatable<Quaternion>
             // Singularity at South Pole
             return new Vector3(
                 0,
-                -HyperMath.PIOver2F,
+                -HyperMath.PiOver2F,
                 -2f * float.Atan2(quaternion.X, quaternion.W)
             );
 

@@ -86,7 +86,7 @@ public sealed class Matrix3x2Tests
     [Test]
     public void CreateRotation()
     {
-        var matrix = Matrix3x2.CreateRotation(HyperMath.PIOver2);
+        var matrix = Matrix3x2.CreateRotation(HyperMath.PiOver2);
         using (Assert.EnterMultipleScope())
         {
             Assert.That(matrix.M00, Is.EqualTo(0f).Within(1e-5));

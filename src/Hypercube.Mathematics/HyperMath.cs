@@ -12,7 +12,7 @@ public static class HyperMath
     /// <summary>
     /// Represents the ratio of a circle's circumference to its diameter (π).
     /// </summary>
-    public const double PI = Math.PI;
+    public const double Pi = Math.PI;
     
     /// <summary>
     /// Represents the ratio of a circle's circumference to its diameter (π), as a float.
@@ -22,57 +22,57 @@ public static class HyperMath
     /// <summary>
     /// Represents π divided by 2.
     /// </summary>
-    public const double PIOver2 = PI / 2;
+    public const double PiOver2 = Pi / 2;
 
     /// <summary>
     /// Represents π divided by 4.
     /// </summary>
-    public const double PIOver4 = PI / 4;
+    public const double PiOver4 = Pi / 4;
 
     /// <summary>
     /// Represents π divided by 6.
     /// </summary>
-    public const double PIOver6 = PI / 6;
+    public const double PiOver6 = Pi / 6;
 
     /// <summary>
     /// Represents 2π (a full circle in radians).
     /// </summary>
-    public const double PITwo = PI * 2;
+    public const double PiTwo = Pi * 2;
 
     /// <summary>
     /// Represents 3π divided by 2.
     /// </summary>
-    public const double ThreePiOver2 = PI / 2 * 3;
+    public const double ThreePiOver2 = Pi / 2 * 3;
 
     /// <summary>
     /// Multiplier to convert radians to degrees.
     /// </summary>
-    public const double RadiansToDegrees = 180 / PI;
+    public const double RadiansToDegrees = 180 / Pi;
 
     /// <summary>
     /// Multiplier to convert degrees to radians.
     /// </summary>
-    public const double DegreesToRadians = PI / 180;
+    public const double DegreesToRadians = Pi / 180;
 
     /// <summary>
     /// Represents π divided by 2 as a float.
     /// </summary>
-    public const float PIOver2F = PIf / 2;
+    public const float PiOver2F = PIf / 2;
 
     /// <summary>
     /// Represents π divided by 4 as a float.
     /// </summary>
-    public const float PIOver4F = PIf / 4;
+    public const float PiOver4F = PIf / 4;
 
     /// <summary>
     /// Represents π divided by 6 as a float.
     /// </summary>
-    public const float PIOver6F = PIf / 6;
+    public const float PiOver6F = PIf / 6;
 
     /// <summary>
     /// Represents 2π as a float.
     /// </summary>
-    public const float PITwoF = PIf * 2;
+    public const float PiTwoF = PIf * 2;
 
     /// <summary>
     /// Represents 3π divided by 2 as a float.
