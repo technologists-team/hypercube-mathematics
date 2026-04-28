@@ -267,7 +267,12 @@ public readonly struct Vector4 :
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector4(Vector3 vector, float w = 0) : this(vector.X, vector.Y, vector.Z, 0)
+    public Vector4(Vector2 vector, float z = 0, float w = 0) : this(vector.X, vector.Y, z, w)
+    {
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector4(Vector3 vector, float w = 0) : this(vector.X, vector.Y, vector.Z, w)
     {
     }
     
