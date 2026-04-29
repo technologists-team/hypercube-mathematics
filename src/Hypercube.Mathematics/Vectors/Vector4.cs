@@ -301,7 +301,7 @@ public readonly struct Vector4 :
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Get(int index)
     {
-        Tools.ThrowIfOutOfRange(index, 0, Dimensionality);
+        Tools.ThrowIfOutOfRange(index, 0, Dimensionality - 1);
         return Unsafe.Add(ref Unsafe.AsRef(in X), index);
     }
     

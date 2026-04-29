@@ -166,7 +166,7 @@ public readonly struct Vector2b : IEquatable<Vector2b>, IEnumerable<bool>, ISpan
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Get(int index)
     {
-        Tools.ThrowIfOutOfRange(index, 0, Dimensionality);
+        Tools.ThrowIfOutOfRange(index, 0, Dimensionality - 1);
         return Unsafe.Add(ref Unsafe.AsRef(in X), index);
     }
     
