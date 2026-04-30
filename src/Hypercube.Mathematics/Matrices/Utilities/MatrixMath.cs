@@ -15,14 +15,18 @@ public static class MatrixMath
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T SquareGet<T>(int row, int col, in T begin, int dimensionality)
+    public static T SquareGet<T>(int row, int col, in T begin, int dimensionality, bool transposed = false)
         where T : unmanaged
     {
         Tools.ThrowIfOutOfRange(row, 0, dimensionality - 1);
         Tools.ThrowIfOutOfRange(col, 0, dimensionality - 1);
 
         ref var start = ref Unsafe.AsRef(in begin);
-        return Unsafe.Add(ref start, row * dimensionality + col);
+        var offset = transposed
+            ? row * dimensionality + col
+            : col * dimensionality + row;
+        
+        return Unsafe.Add(ref start, offset);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

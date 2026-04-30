@@ -18,13 +18,14 @@ public sealed class Accessor_Data
 
         float[] expected =
         [
-            1, 5, 9, 13,
-            2, 6, 10, 14,
-            3, 7, 11, 15,
-            4, 8, 12, 16
+             1,  2,  3,  4,
+             5,  6,  7,  8,
+             9, 10, 11, 12,
+            13, 14, 15, 16
         ];
 
         var actual = matrix.Array;
+        
         Assert.That(actual, Has.Length.EqualTo(Matrix4x4.Length));
         Assert.That(actual, Is.EqualTo(expected));
     }

@@ -327,7 +327,7 @@ public readonly struct Matrix3x3 : IMatrix, IMatrixSquare, IEquatable<Matrix3x3>
     /// Gets the element by row and column index.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float Get(int x, int y) => MatrixMath.SquareGet(x, y, in M00, Dimensionality);
+    public float Get(int x, int y) => MatrixMath.SquareGet(x, y, in M00, Dimensionality, true);
 
     /// <summary>
     /// Compares this matrix with another for exact equality.

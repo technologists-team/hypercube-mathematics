@@ -14,11 +14,12 @@ using JetBrains.Annotations;
 namespace Hypercube.Mathematics.Matrices;
 
 /// <summary>
-/// Implementation of a 4x4 matrix for rendering work. (COLUM-MAJOR)
+/// Implementation of a 4x4 matrix for rendering work. (ROW-MAJOR)
 /// </summary>
 /// <remarks>
-/// Column-major matrix. Column vectors. OpenGL convention.
-/// Vector is multiplied as: M * v
+/// Row-major matrix (M[row, col]).
+/// Stored in row-major memory layout.
+/// Vector multiplication uses: v' = v * M
 /// </remarks>
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -106,82 +107,82 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     #region Fields
 
     /// <summary>
-    /// Matrix x: 0, y: 0 element.
+    /// Matrix row 0, column 0 element.
     /// </summary>
     public readonly float M00;
-    
-    /// <summary>
-    /// Matrix x: 0, y: 1 element.
-    /// </summary>
-    public readonly float M10;
-    
-    /// <summary>
-    /// Matrix x: 0, y: 2 element.
-    /// </summary>
-    public readonly float M20;
-    
-    /// <summary>
-    /// Matrix x: 0, y: 3 element.
-    /// </summary>
-    public readonly float M30;
 
     /// <summary>
-    /// Matrix x: 1, y: 0 element.
+    /// Matrix row 0, column 1 element.
     /// </summary>
     public readonly float M01;
-    
-    /// <summary>
-    /// Matrix x: 1, y: 1 element.
-    /// </summary>
-    public readonly float M11;
-    
-    /// <summary>
-    /// Matrix x: 1, y: 2 element.
-    /// </summary>
-    public readonly float M21;
-    
-    /// <summary>
-    /// Matrix x: 1, y: 3 element.
-    /// </summary>
-    public readonly float M31;
 
     /// <summary>
-    /// Matrix x: 2, y: 0 element.
+    /// Matrix row 0, column 2 element.
     /// </summary>
     public readonly float M02;
 
     /// <summary>
-    /// Matrix x: 2, y: 1 element.
-    /// </summary>
-    public readonly float M12;
-    
-    /// <summary>
-    /// Matrix x: 2, y: 2 element.
-    /// </summary>
-    public readonly float M22;
-    
-    /// <summary>
-    /// Matrix x: 2, y: 3 element.
-    /// </summary>
-    public readonly float M32;
-    
-    /// <summary>
-    /// Matrix x: 3, y: 0 element.
+    /// Matrix row 0, column 3 element.
     /// </summary>
     public readonly float M03;
-    
+
     /// <summary>
-    /// Matrix x: 3, y: 1 element.
+    /// Matrix row 1, column 0 element.
+    /// </summary>
+    public readonly float M10;
+
+    /// <summary>
+    /// Matrix row 1, column 1 element.
+    /// </summary>
+    public readonly float M11;
+
+    /// <summary>
+    /// Matrix row 1, column 2 element.
+    /// </summary>
+    public readonly float M12;
+
+    /// <summary>
+    /// Matrix row 1, column 3 element.
     /// </summary>
     public readonly float M13;
-    
+
     /// <summary>
-    /// Matrix x: 3, y: 2 element.
+    /// Matrix row 2, column 0 element.
+    /// </summary>
+    public readonly float M20;
+
+    /// <summary>
+    /// Matrix row 2, column 1 element.
+    /// </summary>
+    public readonly float M21;
+
+    /// <summary>
+    /// Matrix row 2, column 2 element.
+    /// </summary>
+    public readonly float M22;
+
+    /// <summary>
+    /// Matrix row 2, column 3 element.
     /// </summary>
     public readonly float M23;
 
     /// <summary>
-    /// Matrix x: 3, y: 3 element.
+    /// Matrix row 3, column 0 element.
+    /// </summary>
+    public readonly float M30;
+
+    /// <summary>
+    /// Matrix row 3, column 1 element.
+    /// </summary>
+    public readonly float M31;
+
+    /// <summary>
+    /// Matrix row 3, column 2 element.
+    /// </summary>
+    public readonly float M32;
+
+    /// <summary>
+    /// Matrix row 3, column 3 element.
     /// </summary>
     public readonly float M33;
     
@@ -278,7 +279,7 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     }
     
     /// <summary>
-    /// Returns a new array containing the matrix elements in column-major order.
+    /// Returns a new array containing the matrix elements in row-major order.
     /// </summary>
     public float[] Array
     {
@@ -287,7 +288,7 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     }
     
     /// <summary>
-    /// Returns a read-only span that wraps the matrix elements in column-major order.
+    /// Returns a read-only span that wraps the matrix elements in row-major order.
     /// </summary>
     public ReadOnlySpan<float> Span
     {
@@ -311,7 +312,7 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     }
     
     /// <summary>
-    /// Gets the element at the specified linear index (column-major).
+    /// Gets the element at the specified linear index (row-major).
     /// </summary>
     public float this[int index]
     {
@@ -669,28 +670,28 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     
     /// <summary>
     /// Transforms a rectangle by the matrix.
+    /// row-major: v' = v * M
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rect2 operator *(Matrix4x4 a, Rect2 r)
+    public static Rect2 operator *(Rect2 r, Matrix4x4 m)
     {
-        var v1 = a * r.TopRight;
-        var v2 = a * r.BottomLeft;
+        var v1 = new Vector2(r.Right, r.Top) * m;
+        var v2 = new Vector2(r.Left, r.Bottom) * m;
         return new Rect2(v2.X, v1.Y, v1.X, v2.Y);
     }
-
+    
     /// <summary>
     /// Transforms a 4-point rectangle by the matrix.
+    /// row-major: v' = v * M
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rect4 operator *(Matrix4x4 a, Rect4 r)
-    {
-        return new Rect4(
-            a * r.Point0,
-            a * r.Point1,
-            a * r.Point2,
-            a * r.Point3
+    public static Rect4 operator *(Rect4 r, Matrix4x4 m) =>
+        new(
+            r.Point0 * m,
+            r.Point1 * m,
+            r.Point2 * m,
+            r.Point3 * m
         );
-    }
 
     #endregion
 
@@ -698,61 +699,54 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     /// Multiplies each element of the matrix by a scalar.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix4x4 operator *(Matrix4x4 a, float s)
-    {
-        return new Matrix4x4(
+    public static Matrix4x4 operator *(Matrix4x4 a, float s) =>
+        new(
             a.M00 * s, a.M01 * s, a.M02 * s, a.M03 * s,
             a.M10 * s, a.M11 * s, a.M12 * s, a.M13 * s,
             a.M20 * s, a.M21 * s, a.M22 * s, a.M23 * s,
             a.M30 * s, a.M31 * s, a.M32 * s, a.M33 * s
         );
-    }
 
     /// <summary>
-    /// Transforms a Vector2 by the matrix (assuming W=1).
+    /// Transforms a Vector2 by the matrix (assuming z = 0, w = 1).
+    /// row-major: v' = v * M
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator *(Matrix4x4 a, Vector2 v)
-    {
-        return new Vector2(
-            a.M00 * v.X + a.M01 * v.Y + a.M03,
-            a.M10 * v.X + a.M11 * v.Y + a.M13
+    public static Vector2 operator *(Vector2 v, Matrix4x4 m) =>
+        new(
+            v.X * m.M00 + v.Y * m.M10 + m.M30,
+            v.X * m.M01 + v.Y * m.M11 + m.M31
         );
-    }
 
     /// <summary>
-    /// Transforms a Vector3 by the matrix (assuming W=1).
+    /// Transforms a Vector3 by the matrix (assuming w = 1).
+    /// row-major: v' = v * M
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 operator *(Matrix4x4 a, Vector3 v)
-    {
-        return new Vector3(
-            a.M00 * v.X + a.M01 * v.Y + a.M02 * v.Z + a.M03,
-            a.M10 * v.X + a.M11 * v.Y + a.M12 * v.Z + a.M13,
-            a.M20 * v.X + a.M21 * v.Y + a.M22 * v.Z + a.M23
+    public static Vector3 operator *(Vector3 v, Matrix4x4 m) =>
+        new(
+            v.X * m.M00 + v.Y * m.M10 + v.Z * m.M20 + m.M30,
+            v.X * m.M01 + v.Y * m.M11 + v.Z * m.M21 + m.M31,
+            v.X * m.M02 + v.Y * m.M12 + v.Z * m.M22 + m.M32
         );
-    }
 
     /// <summary>
     /// Transforms a <see cref="Vector4"/> by the matrix.
+    /// row-major: v' = v * M
     /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector4 operator *(Matrix4x4 a, Vector4 v)
-    {
-        return new Vector4(
-            a.M00 * v.X + a.M01 * v.Y + a.M02 * v.Z + a.M03 * v.W,
-            a.M10 * v.X + a.M11 * v.Y + a.M12 * v.Z + a.M13 * v.W,
-            a.M20 * v.X + a.M21 * v.Y + a.M22 * v.Z + a.M23 * v.W,
-            a.M30 * v.X + a.M31 * v.Y + a.M32 * v.Z + a.M33 * v.W
+    public static Vector4 operator *(Vector4 v, Matrix4x4 m) =>
+        new(
+            v.X * m.M00 + v.Y * m.M10 + v.Z * m.M20 + v.W * m.M30,
+            v.X * m.M01 + v.Y * m.M11 + v.Z * m.M21 + v.W * m.M31,
+            v.X * m.M02 + v.Y * m.M12 + v.Z * m.M22 + v.W * m.M32,
+            v.X * m.M03 + v.Y * m.M13 + v.Z * m.M23 + v.W * m.M33
         );
-    }
 
     /// <summary>
     /// Multiplies two matrices (A * B).
     /// </summary>
-    public static Matrix4x4 operator *(Matrix4x4 a, Matrix4x4 b)
-    {
-        return new Matrix4x4(
+    public static Matrix4x4 operator *(Matrix4x4 a, Matrix4x4 b) =>
+        new(
             // Row 0
             a.M00 * b.M00 + a.M01 * b.M10 + a.M02 * b.M20 + a.M03 * b.M30,
             a.M00 * b.M01 + a.M01 * b.M11 + a.M02 * b.M21 + a.M03 * b.M31,
@@ -774,8 +768,7 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
             a.M30 * b.M02 + a.M31 * b.M12 + a.M32 * b.M22 + a.M33 * b.M32,
             a.M30 * b.M03 + a.M31 * b.M13 + a.M32 * b.M23 + a.M33 * b.M33
         );
-    }
-    
+
     #endregion
     
     #endregion
@@ -788,24 +781,64 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     /// Creates a 4x4 identity matrix from a 3x3 matrix basis.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix4x4 CreateIdentity(Matrix3x3 matrix)
-    {
-        return new Matrix4x4(
+    public static Matrix4x4 CreateIdentity(Matrix3x3 matrix) =>
+        new(
             matrix.M00, matrix.M01, matrix.M02, 0,
             matrix.M10, matrix.M11, matrix.M12, 0,
             matrix.M20, matrix.M21, matrix.M22, 0,
             0, 0, 0, 1
         );
-    }
 
     #endregion
     
     #region Transform
-    
+
+    /// <summary>
+    /// Creates a transformation matrix using S * R * T order (row-major).
+    /// </summary>
+    public static Matrix4x4 CreateTransform(Vector3 position, Quaternion rotation, Vector3 scale)
+        => CreateTransformSRT(position, rotation, scale);
+
+    /// <summary>
+    /// Creates a transformation matrix using S * R * T order (row-major).
+    /// </summary>
+    public static Matrix4x4 CreateTransformSRT(Vector3 position, Quaternion rotation, Vector3 scale)
+    {
+        // Auxiliary variables for quaternions
+        var xx = rotation.X * rotation.X;
+        var yy = rotation.Y * rotation.Y;
+        var zz = rotation.Z * rotation.Z;
+        var xy = rotation.X * rotation.Y;
+        var wz = rotation.Z * rotation.W;
+        var xz = rotation.Z * rotation.X;
+        var wy = rotation.Y * rotation.W;
+        var yz = rotation.Y * rotation.Z;
+        var wx = rotation.X * rotation.W;
+
+        // Scaling the rotation matrix
+        var m00 = (1 - 2 * (yy + zz)) * scale.X;
+        var m01 = 2 * (xy + wz) * scale.X;
+        var m02 = 2 * (xz - wy) * scale.X;
+        var m10 = 2 * (xy - wz) * scale.Y;
+        var m11 = (1 - 2 * (zz + xx)) * scale.Y;
+        var m12 = 2 * (yz + wx) * scale.Y;
+        var m20 = 2 * (xz + wy) * scale.Z;
+        var m21 = 2 * (yz - wx) * scale.Z;
+        var m22 = (1 - 2 * (yy + xx)) * scale.Z;
+
+        // Create SRT matrix
+        return new Matrix4x4(
+            m00, m01, m02, 0,
+            m10, m11, m12, 0,
+            m20, m21, m22, 0,
+            position.X, position.Y, position.Z, 1
+        );
+    }
+
     /// <summary>
     /// Creates a transformation matrix using T * R * S order.
     /// </summary>
-    public static Matrix4x4 CreateTransform(Vector3 position, Quaternion rotation, Vector3 scale)
+    public static Matrix4x4 CreateTransformTRS(Vector3 position, Quaternion rotation, Vector3 scale)
     {
         // Auxiliary variables for quaternions
         var xx = rotation.X * rotation.X;
@@ -833,13 +866,13 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
 
         // Create a TRS matrix
         return new Matrix4x4(
-                   m00,        m10,        m20, 0,
-                   m01,        m11,        m21, 0,
-                   m02,        m12,        m22, 0,
+            m00, m01, m02, 0,
+            m10, m11, m12, 0,
+            m20, m21, m22, 0,
             position.X, position.Y, position.Z, 1
         );
     }
-    
+
     #endregion
     
     #region Scale
@@ -866,16 +899,14 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     /// Creates a scaling matrix from X, Y, Z components.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix4x4 CreateScale(float x, float y, float z)
-    {
-        return new Matrix4x4(
+    public static Matrix4x4 CreateScale(float x, float y, float z) =>
+        new(
             x, 0, 0, 0,
             0, y, 0, 0,
             0, 0, z, 0,
             0, 0, 0, 1
         );
-    }
-    
+
     #endregion
     
     #region Rotation
@@ -916,8 +947,8 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix4x4 CreateRotation(Vector3 direction, float angle)
     {
-        var cos = float.Cos(-angle);
-        var sin = float.Sin(-angle);
+        var cos = float.Cos(angle);
+        var sin = float.Sin(angle);
         var t = 1.0f - cos;
         
         direction = direction.Normalized;
@@ -1043,16 +1074,14 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     /// Creates a translation matrix from X, Y, Z components.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix4x4 CreateTranslation(float x, float y, float z)
-    {
-        return new Matrix4x4(
-            1, 0, 0, x,
-            0, 1, 0, y,
-            0, 0, 1, z,
-            0, 0, 0, 1
+    public static Matrix4x4 CreateTranslation(float x, float y, float z) =>
+        new(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            x, y, z, 1
         );
-    }
-    
+
     #endregion
     
     #region Projection
@@ -1078,35 +1107,57 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
     /// <summary>
     /// Creates an off-center orthographic projection matrix (OpenGL convention).
     /// </summary>
-    public static Matrix4x4 CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNear, float zFar)
+    public static Matrix4x4 CreateOrthographicOffCenter(
+        float left,
+        float right,
+        float bottom,
+        float top,
+        float zNear,
+        float zFar)
     {
-        var invRL = 1.0f / (right - left);
-        var invTB = 1.0f / (top - bottom);
-        var invFN = 1.0f / (zFar - zNear);
+        var invRL = 1f / (right - left);
+        var invTB = 1f / (top - bottom);
+        var invFN = 1f / (zFar - zNear);
 
+        
+        // Scaling the rotation matrix
+        var m00 = 2f *  invRL;
+        var m11 = 2f *  invTB;
+        var m22 = 2f * -invFN;
+        
+        var m30 = -(right + left) * invRL;
+        var m31 = -(top + bottom) * invTB;
+        var m32 = -(zFar + zNear) * invFN;
+        
         return new Matrix4x4(
-            2f * invRL, 0,           0,          -(right + left) * invRL, // Row 0
-            0,          2f * invTB,  0,          -(top + bottom) * invTB, // Row 1
-            0,          0,          -2f * invFN, -(zFar + zNear) * invFN, // Row 2
-            0,          0,           0,                                 1 // Row 3
+            m00,   0,   0, 0,
+              0, m11,   0, 0,
+              0,   0, m22, 0,
+            m30, m31, m32, 1
         );
     }
     
     /// <summary>
     /// Creates a perspective projection matrix (OpenGL convention).
     /// </summary>
-    public static Matrix4x4 CreatePerspective(float fov, float aspect, float zNear, float zFar)
+    public static Matrix4x4 CreatePerspective(
+        float fov,
+        float aspect,
+        float zNear,
+        float zFar)
     {
         var tanHalfFov = float.Tan(fov * 0.5f);
-        var height = 1.0f / tanHalfFov;
-        var width = height / aspect;
+
+        var h = 1f / tanHalfFov;
+        var w = h / aspect;
+
         var range = zFar / (zNear - zFar);
 
         return new Matrix4x4(
-            width, 0,      0,     0,
-            0,     height, 0,     0,
-            0,     0,      range, range * zNear, // Row 2
-            0,     0,      -1,    0              // Row 3 (w' = -z)
+            w,  0,  0,              0,
+            0,  h,  0,              0,
+            0,  0,  range,         -1,
+            0,  0,  range * zNear,  0
         );
     }
     

@@ -31,34 +31,34 @@ public sealed class Operation_Multiply
     public void Multiply_Vector2()
     {
         var transform =
-            Matrix4x4.CreateScale(2, 3, 1) *
-            Matrix4x4.CreateTranslation(1, 2, 0);
+            Matrix4x4.CreateTranslation(1, 2, 0) *
+            Matrix4x4.CreateScale(2, 3, 1);
         
         var vector = new Vector2(1, 1);
         var excepted = new Vector2(4, 9);
-        AssertAreEqual(transform * vector, excepted);
+        AssertAreEqual(vector * transform, excepted);
     }
 
     [Test]
     public void Multiply_Vector3()
     {
         var transform =
-            Matrix4x4.CreateScale(2, 3, 4) *
-            Matrix4x4.CreateTranslation(1, 2, 3);
+            Matrix4x4.CreateTranslation(1, 2, 3) *
+            Matrix4x4.CreateScale(2, 3, 4);
         
         var vector = new Vector3(1, 1, 1);
         var excepted = new Vector3(4, 9, 16);
-        AssertAreEqual(transform * vector, excepted);
+        AssertAreEqual(vector * transform, excepted);
     }
 
     [Test]
     public void Multiply_Vector4()
     {
         var translation = new Matrix4x4(
-            1, 0, 0, 10,
-            0, 1, 0, 20,
-            0, 0, 1, 30,
-            0, 0, 0, 1
+             1,  0,  0, 0,
+             0,  1,  0, 0,
+             0,  0,  1, 0,
+            10, 20, 30, 1
         );
 
         var scale = new Matrix4x4(
@@ -68,15 +68,15 @@ public sealed class Operation_Multiply
             0, 0, 0, 1
         );
 
-        AssertAreEqual(translation * new Vector4(1, 2, 3, 1), new Vector4(11, 22, 33, 1));
-        AssertAreEqual(scale * new Vector4(1, 2, 3, 1), new Vector4(2, 6, 12, 1));
+        AssertAreEqual(new Vector4(1, 2, 3, 1) * translation, new Vector4(11, 22, 33, 1));
+        AssertAreEqual(new Vector4(1, 2, 3, 1) * scale      , new Vector4(2, 6, 12, 1));
     }
 
     [Test]
-    public void Multiply_Indentity_Vector4()
+    public void Multiply_Identity_Vector4()
     {
         var original = new Vector4(1, 2, 3, 4);
-        AssertAreEqual(Matrix4x4.Identity * original, original);
+        AssertAreEqual(original * Matrix4x4.Identity, original);
     }
 
     [Test]

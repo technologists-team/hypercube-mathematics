@@ -51,6 +51,28 @@ public readonly struct Quaternion : IEquatable<Quaternion>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => new(Vector.W);
     }
+
+    /// <summary>
+    /// Returns the conjugate of the quaternion.
+    /// </summary>
+    public Quaternion Conjugated
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(-X, -Y, -Z, W);
+    }
+
+    /// <summary>
+    /// Returns the inverse of the quaternion (conjugate divided by squared length).
+    /// </summary>
+    public Quaternion Inversed
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get
+        {
+            var invNorm = 1f / LengthSquared;
+            return new Quaternion(-X * invNorm, -Y * invNorm, -Z * invNorm, W * invNorm);
+        }
+    }
     
     public float X
     {

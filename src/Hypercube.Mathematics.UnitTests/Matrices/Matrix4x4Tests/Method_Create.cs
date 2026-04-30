@@ -13,8 +13,14 @@ public sealed class Method_Create
     [Test, TestCaseSource(nameof(TransformTestData))]
     public void Create_Transform_ShouldMatchSequentialMultiplication(Vector3 translation, Quaternion rotation, Vector3 scale)
     {
-        var expected = Matrix4x4.CreateTranslation(translation) * Matrix4x4.CreateRotation(rotation) * Matrix4x4.CreateScale(scale);
-        var actual = Matrix4x4.CreateTransform(translation, rotation, scale);
+        var expected =
+            Matrix4x4.CreateScale(scale) *
+            Matrix4x4.CreateRotation(rotation) *
+            Matrix4x4.CreateTranslation(translation);
+        
+        var actual =
+            Matrix4x4.CreateTransformSRT(translation, rotation, scale);
+       
         AssertAreEqual(actual, expected, Delta);
     }
 
@@ -33,7 +39,7 @@ public sealed class Method_Create
         yield return new TestCaseData(Vector3.Zero, Quaternion.Identity, new Vector3(-1, 1, 1))
             .SetName("Transform_NegativeScale_Mirroring");
         yield return new TestCaseData(new Vector3(10, 20, 30), Quaternion.FromEuler(0.5f, 0.2f, 0.1f), new Vector3(1, 2, 3))
-            .SetName("Transform_CombinedTRS");
+            .SetName("Transform_CombinedSRT");
         yield return new TestCaseData(new Vector3(0.001f, 0.001f, 0.001f), Quaternion.Identity, Vector3.One)
             .SetName("Transform_MicroTranslation");
         yield return new TestCaseData(Vector3.Zero, Quaternion.Identity, Vector3.Zero)
@@ -43,7 +49,7 @@ public sealed class Method_Create
     [Test, TestCaseSource(nameof(RotationXYZTestData))]
     public void Create_Rotation_Axes(Matrix4x4 rotationMatrix, Vector3 input, Vector3 expected)
     {
-        AssertAreEqual(rotationMatrix * input, expected, Delta);
+        AssertAreEqual(input * rotationMatrix, expected, Delta);
     }
 
     private static IEnumerable<TestCaseData> RotationXYZTestData()
@@ -51,11 +57,8 @@ public sealed class Method_Create
         const float angle = float.Pi / 2;
         var v = new Vector3(0, 1, 0);
         
-        yield return new TestCaseData(Matrix4x4.CreateRotationX(angle), v, new Vector3(0, 0, -1))
-            .SetName("Rotation_X_Axis");
-        yield return new TestCaseData(Matrix4x4.CreateRotationY(angle), v, new Vector3(0, 1, 0))
-            .SetName("Rotation_Y_Axis");
-        yield return new TestCaseData(Matrix4x4.CreateRotationZ(angle), v, new Vector3(-1, 0, 0))
-            .SetName("Rotation_Z_Axis");
+        yield return new TestCaseData(Matrix4x4.CreateRotationX(angle), v, new Vector3(0, 0, 1)).SetName("Rotation_X_Axis");
+        yield return new TestCaseData(Matrix4x4.CreateRotationY(angle), v, new Vector3(0, 1, 0)).SetName("Rotation_Y_Axis");
+        yield return new TestCaseData(Matrix4x4.CreateRotationZ(angle), v, new Vector3(1, 0, 0)).SetName("Rotation_Z_Axis");
     }
 }
