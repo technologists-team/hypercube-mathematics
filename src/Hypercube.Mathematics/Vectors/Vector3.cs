@@ -461,14 +461,17 @@ public readonly struct Vector3 :
         (a - b).LengthFast;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Cross(Vector3 a, Vector3 b)
-    {
-        // TODO: SMID?
-        return new Vector3(
+    public static Vector3 Lerp(Vector3 a, Vector3 b, float t)
+        => new(Vector128.Lerp(a.AsVector128(), b.AsVector128(), Vector128.Create(t)));
+
+    
+    // TODO: SMID?
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 Cross(Vector3 a, Vector3 b) =>
+        new(
             a.Y * b.Z - a.Z * b.Y,
             a.Z * b.X - a.X * b.Z,
             a.X * b.Y - a.Y * b.X);
-    }
 
     #endregion
 
