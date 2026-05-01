@@ -13,11 +13,12 @@ namespace Hypercube.Mathematics.Vectors;
 
 /// <summary>
 /// Represents a vector with two single-precision floating-point values.
-/// Optimized with SIMD.
 /// </summary>
-[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
-[SuppressMessage("ReSharper", "InconsistentNaming")]
+/// <remarks>
+/// Uses SIMD optimization.
+/// </remarks>
 [DebuggerDisplay("{ToString()}")]
+[PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 public readonly struct Vector2 :
     IEquatable<Vector2>,
     IComparable<Vector2>,
@@ -43,6 +44,8 @@ public readonly struct Vector2 :
     /// The number of components in the vector.
     /// </summary>
     public const int Dimensionality = 2;
+    
+    public const int Range = Dimensionality - 1;
     
     /// <summary>
     /// A vector where all elements are <see cref="float.NaN"/>.
@@ -74,7 +77,7 @@ public readonly struct Vector2 :
     /// MaxValue, MaxValue
     /// </code>
     /// </summary>
-    public static readonly Vector2 Max = new(float.MaxValue);
+    public static readonly Vector2 MaxValue = new(float.MaxValue);
     
     /// <summary>
     /// A vector where all elements are <see cref="float.MinValue"/>.
@@ -82,7 +85,7 @@ public readonly struct Vector2 :
     /// MinValue, MinValue
     /// </code>
     /// </summary>
-    public static readonly Vector2 Min = new(float.MinValue);
+    public static readonly Vector2 MinValue = new(float.MinValue);
     
     /// <summary>
     /// A vector where all elements are zero.
@@ -116,8 +119,6 @@ public readonly struct Vector2 :
     /// </summary>
     public static readonly Vector2 UnitY = new(0f, 1f);
     
-    #endregion
-    
     public static Vector2 AdditiveIdentity
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,17 +131,19 @@ public readonly struct Vector2 :
         get => One;
     }
 
-    public static Vector2 MinValue
+    static Vector2 IMinMaxValue<Vector2>.MinValue
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Min;
+        get => MinValue;
     }
 
-    public static Vector2 MaxValue
+    static Vector2 IMinMaxValue<Vector2>.MaxValue
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Max;
+        get => MaxValue;
     }
+    
+    #endregion
 
     #region Fields
     
@@ -302,7 +305,7 @@ public readonly struct Vector2 :
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Get(int index)
     {
-        Tools.ThrowIfOutOfRange(index, 0, Dimensionality - 1);
+        Tools.ThrowIfOutOfRange(index, 0, Range);
         return Unsafe.Add(ref Unsafe.AsRef(in X), index);
     }
     
@@ -316,6 +319,9 @@ public readonly struct Vector2 :
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Angle AsAngle() => new(Angle);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2Angle AsVectorAngle() => new(X, Y);
 
     /// <summary>
     /// Returns a new array containing the vector elements.
@@ -376,12 +382,10 @@ public readonly struct Vector2 :
     /// Rotate vector CCW.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2 Rotate(float cos, float sin)
-    {
+    public Vector2 Rotate(float cos, float sin) =>
         // [ cos; -sin ]
         // [ sin;  cos ]
-        return new Vector2(X * cos - Y * sin, X * sin + Y * cos);
-    }
+        new(X * cos - Y * sin, X * sin + Y * cos);
 
     /// <summary>
     /// Rotate vector CW.
@@ -408,12 +412,10 @@ public readonly struct Vector2 :
     /// Rotate vector CW.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2 InvRotate(float cos, float sin)
-    {
+    public Vector2 InvRotate(float cos, float sin) =>
         // [  cos; sin ]
         // [ -sin; cos ]
-        return new Vector2(X * cos + Y * sin, Y * cos - X * sin);
-    }
+        new(X * cos + Y * sin, Y * cos - X * sin);
 
     #endregion
     
@@ -429,12 +431,12 @@ public readonly struct Vector2 :
         X.AboutEquals(other.X, tolerance) &&
         Y.AboutEquals(other.Y, tolerance);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override bool Equals(object? obj) =>
         obj is Vector2 other &&
         Equals(other);
     
-    /// <inheritdoc/>
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode() =>
         HashCode.Combine(X, Y);
@@ -443,15 +445,15 @@ public readonly struct Vector2 :
 
     #region String Formating
     
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override string ToString() =>
         ToString(null, CultureInfo.InvariantCulture);
     
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public string ToString(string? format, IFormatProvider? formatProvider) =>
         $"{X.ToString(format, formatProvider)}, {Y.ToString(format, formatProvider)}";
     
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format,
         IFormatProvider? provider) => destination.TryWrite(provider, $"{X}, {Y}", out charsWritten);
     
@@ -459,7 +461,7 @@ public readonly struct Vector2 :
 
     #region IEnumerable
     
-    /// <inheritdoc/>
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -482,10 +484,25 @@ public readonly struct Vector2 :
     #endregion
 
     #region Math
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float Dot(Vector2 b) => Dot(this, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2 Clamp(Vector2 min, Vector2 max) => Clamp(this, min, max);
+    public float DistanceSquared(Vector2 b) => DistanceSquared(this, b);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float Distance(Vector2 b) => Distance(this, b);
+   
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float DistanceFast(Vector2 b) => DistanceFast(this, b);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Reflect(Vector2 normale) => Reflect(this, normale);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Lerp(Vector2 b, float t) => Lerp(this, b, t);
+    
     #endregion
     
     #region Static Math
@@ -507,8 +524,79 @@ public readonly struct Vector2 :
         new(Vector64.Ceiling(vector.AsVector64()));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Clamp(Vector2 vector, Vector2 min, Vector2 max) =>
-        new(Vector64.Min(Vector64.Max(vector.AsVector64(), min.AsVector64()), max.AsVector64()));
+    public static Vector2 Min(Vector2 a, Vector2 b) =>
+        new(Vector64.Min(a.AsVector64(), b.AsVector64()));
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 Min(params Vector2[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+
+        if (values.Length == 0)
+            throw new ArgumentException("Sequence contains no elements.", nameof(values));
+
+        var result = values[0].AsVector64();
+        for (var i = 1; i < values.Length; i++)
+        {
+            result = Vector64.Min(result, values[i].AsVector64());
+        }
+
+        return new Vector2(result);
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 Min(in ReadOnlySpan<Vector2> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Sequence contains no elements.", nameof(values));
+
+        var result = values[0].AsVector64();
+        for (var i = 1; i < values.Length; i++)
+        {
+            result = Vector64.Min(result, values[i].AsVector64());
+        }
+
+        return new Vector2(result);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 Max(params Vector2[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+
+        if (values.Length == 0)
+            throw new ArgumentException("Sequence contains no elements.", nameof(values));
+
+        var result = values[0].AsVector64();
+        for (var i = 1; i < values.Length; i++)
+        {
+            result = Vector64.Max(result, values[i].AsVector64());
+        }
+
+        return new Vector2(result);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 Max(in ReadOnlySpan<Vector2> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Sequence contains no elements.", nameof(values));
+
+        var result = values[0].AsVector64();
+        for (var i = 1; i < values.Length; i++)
+        {
+            result = Vector64.Max(result, values[i].AsVector64());
+        }
+
+        return new Vector2(result);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 Clamp(Vector2 vector, Vector2 min, Vector2 max)
+    {
+        if (min.X > max.X || min.Y > max.Y)
+            throw new ArgumentOutOfRangeException(nameof(min), "Clamp minimum cannot be greater than maximum.");
+        return new Vector2(Vector64.Min(Vector64.Max(vector.AsVector64(), min.AsVector64()), max.AsVector64()));
+    }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Dot(Vector2 a, Vector2 b) =>
@@ -531,13 +619,30 @@ public readonly struct Vector2 :
         v - 2f * Dot(v, n) * n;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
-        => new(Vector64.Lerp(a.AsVector64(), b.AsVector64(), Vector64.Create(t)));
+    public static Vector2 Lerp(Vector2 a, Vector2 b, float t) =>
+        new(Vector64.Lerp(a.AsVector64(), b.AsVector64(), Vector64.Create(t)));
     
     #endregion
 
     #region Operators
 
+    #region Vector64
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 operator +(Vector2 a, Vector64<float> b) => new(a.AsVector64() + b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 operator +(Vector64<float> a, Vector2 b) => new(a + b.AsVector64());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 operator -(Vector2 a, Vector64<float> b) => new(a.AsVector64() - b);
+
+    public static Vector2 operator -(Vector64<float> a, Vector2 b) => new(a - b.AsVector64());
+    
+    #endregion
+
+    #region Calculation
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Vector2 a, Vector2 b) => a.AboutEquals(b);
 
@@ -546,9 +651,6 @@ public readonly struct Vector2 :
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 operator +(Vector2 a, Vector2 b) => new(a.AsVector64() + b.AsVector64());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator +(Vector2 a, Vector64<float> b) => new(a.AsVector64() + b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 operator +(Vector2 a, float b) => a + Vector64.Create(b);
@@ -562,9 +664,6 @@ public readonly struct Vector2 :
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 operator -(Vector2 a, Vector2 b) => new(a.AsVector64() - b.AsVector64());
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 operator -(Vector2 a, Vector64<float> b) => new(a.AsVector64() - b);
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 operator -(Vector2 a, float b) => a - Vector64.Create(b);
 
@@ -589,11 +688,19 @@ public readonly struct Vector2 :
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 operator /(Vector2 a, float b) => new(a.AsVector64() / b);
     
+    #endregion
+
+    #region Implict
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2((float x, float y) a) => new(a.x, a.y);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator (float x, float y)(Vector2 a) => (a.X, a.Y);
+
+    #endregion
+
+    #region Explict
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator Vector2i(Vector2 a) => new((int) a.X, (int) a.Y);
@@ -618,6 +725,8 @@ public readonly struct Vector2 :
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator Vector5(Vector2 a) => new(a);
+
+    #endregion
     
     #endregion
 }
