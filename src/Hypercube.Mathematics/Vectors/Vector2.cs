@@ -96,6 +96,14 @@ public readonly struct Vector2 :
     public static readonly Vector2 Zero = new(0f);
     
     /// <summary>
+    /// A vector where all elements are 1 / 2.
+    /// <code>
+    /// 0.5, 0.5
+    /// </code>
+    /// </summary>
+    public static readonly Vector2 Half = new(0.5f);
+    
+    /// <summary>
     /// A vector where all elements are one.
     /// <code>
     /// 1, 1
