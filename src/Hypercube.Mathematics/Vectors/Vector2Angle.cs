@@ -90,28 +90,52 @@ public readonly struct Vector2Angle
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Angle AsAngle() => new(Angle);
+
+    /// <summary>
+    /// Rotate vector CW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Rotate(Vector2 vector)
+    {
+        var x = vector.X;
+        var y = vector.Y;
+        return new Vector2(Cos * x - Sin * y, Sin * x + Cos * y);
+    }
+    
+    /// <summary>
+    /// Rotate vector CCW.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 InvRotate(Vector2 vector)
+    {
+        var x = vector.X;
+        var y = vector.Y;
+        return new Vector2(Cos * x + Sin * y, Cos * y - Sin * x);
+    }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2Angle AddAngle(Vector2Angle other)
-    {
+    public Vector2Angle AddAngle(Vector2Angle other) =>
         // cos(a + b)
         // sin(a + b)
-        return new Vector2Angle(
+        new(
             Cos * other.Cos - Sin * other.Sin,
             Sin * other.Cos + Cos * other.Sin
         );
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2Angle SubtractAngle(Vector2Angle other)
-    {
+    public Vector2Angle SubtractAngle(Vector2Angle other) =>
         // cos(a - b)
         // sin(a - b)
-        return new Vector2Angle(
+        new(
             Cos * other.Cos + Sin * other.Sin,
             Sin * other.Cos - Cos * other.Sin
         );
-    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2Angle operator +(Vector2Angle a, Vector2Angle b) => a.AddAngle(b);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2Angle operator -(Vector2Angle a, Vector2Angle b) => a.SubtractAngle(b);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator Angle(Vector2Angle vector) => vector.AsAngle();

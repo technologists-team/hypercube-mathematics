@@ -27,13 +27,13 @@ public readonly struct Circle : IEquatable<Circle>
     public float Area
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Radius * Radius * HyperMath.PIf;
+        get => Radius * Radius * HyperMath.PiF;
     }
     
     public float Circumference
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => 2 * HyperMath.PIf * Radius;
+        get => 2 * HyperMath.PiF * Radius;
     }
     
     public Rect2 BoundingBox

@@ -629,6 +629,10 @@ public readonly struct Vector2 :
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Lerp(Vector2 a, Vector2 b, float t) =>
         new(Vector64.Lerp(a.AsVector64(), b.AsVector64(), Vector64.Create(t)));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 CrossScalar(float s, Vector2 a) =>
+        new(-s * a.Y, s * a.X);
     
     #endregion
 

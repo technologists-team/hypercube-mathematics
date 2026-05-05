@@ -17,13 +17,18 @@ public static class HyperMath
     /// <summary>
     /// Represents the ratio of a circle's circumference to its diameter (π), as a float.
     /// </summary>
-    public const float PIf = MathF.PI;
+    public const float PiF = MathF.PI;
 
     /// <summary>
     /// Represents π divided by 2.
     /// </summary>
     public const double PiOver2 = Pi / 2;
-
+    
+    /// <summary>
+    /// Represents π divided by 3.
+    /// </summary>
+    public const double PiOver3 = Pi / 3;
+    
     /// <summary>
     /// Represents π divided by 4.
     /// </summary>
@@ -37,12 +42,17 @@ public static class HyperMath
     /// <summary>
     /// Represents 2π (a full circle in radians).
     /// </summary>
-    public const double PiTwo = Pi * 2;
+    public const double Pi2 = Pi * 2;
+
+    /// <summary>
+    /// Represents 2π divided by 3 .
+    /// </summary>
+    public const double Pi2Over3 = Pi / 3 * 2;
 
     /// <summary>
     /// Represents 3π divided by 2.
     /// </summary>
-    public const double ThreePiOver2 = Pi / 2 * 3;
+    public const double Pi3Over2 = Pi / 2 * 3;
 
     /// <summary>
     /// Multiplier to convert radians to degrees.
@@ -57,37 +67,47 @@ public static class HyperMath
     /// <summary>
     /// Represents π divided by 2 as a float.
     /// </summary>
-    public const float PiOver2F = PIf / 2;
+    public const float PiOver2F = PiF / 2;
 
+    /// <summary>
+    /// Represents π divided by 2 as a float.
+    /// </summary>
+    public const float PiOver3F = PiF / 3;
+    
     /// <summary>
     /// Represents π divided by 4 as a float.
     /// </summary>
-    public const float PiOver4F = PIf / 4;
+    public const float PiOver4F = PiF / 4;
 
     /// <summary>
     /// Represents π divided by 6 as a float.
     /// </summary>
-    public const float PiOver6F = PIf / 6;
+    public const float PiOver6F = PiF / 6;
 
     /// <summary>
     /// Represents 2π as a float.
     /// </summary>
-    public const float PiTwoF = PIf * 2;
+    public const float Pi2F = PiF * 2;
 
+    /// <summary>
+    /// Represents 2π divided by 3 as a float.
+    /// </summary>
+    public const float Pi2Over3F = PiF / 3 * 2;
+    
     /// <summary>
     /// Represents 3π divided by 2 as a float.
     /// </summary>
-    public const float ThreePiOver2F = PIf / 2 * 3;
+    public const float Pi3Over2F = PiF / 2 * 3;
 
     /// <summary>
     /// Multiplier to convert radians to degrees (float).
     /// </summary>
-    public const float RadiansToDegreesF = 180 / PIf;
+    public const float RadiansToDegreesF = 180 / PiF;
 
     /// <summary>
     /// Multiplier to convert degrees to radians (float).
     /// </summary>
-    public const float DegreesToRadiansF = PIf / 180;
+    public const float DegreesToRadiansF = PiF / 180;
 
     /// <summary>
     /// </summary>
@@ -96,7 +116,7 @@ public static class HyperMath
     /// <summary>
     /// </summary>
     public const double DoubleTolerance = 1e-15d;
-    
+
     /// <summary>
     /// Determines whether two floating-point values are approximately equal, within a specified tolerance.
     /// </summary>
