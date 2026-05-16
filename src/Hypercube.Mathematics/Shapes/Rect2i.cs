@@ -71,6 +71,12 @@ public readonly struct Rect2i
         Point0 = new Vector2i(left, top);
         Point1 = new Vector2i(right, bottom);
     }
+    
+    public Rect2i(float left, float top, float right, float bottom)
+    {
+        Point0 = new Vector2i((int) left, (int) top);
+        Point1 = new Vector2i((int) right, (int) bottom);
+    }
 
     public Rect2i(int value)
     {
@@ -84,14 +90,16 @@ public readonly struct Rect2i
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rect2i operator +(Rect2i a, Rect2i b)
-    {
-        return new Rect2i(a.Point0 + b.Point0, a.Point1 + b.Point1);
-    }
+    public static Rect2i operator +(Rect2i a, Rect2i b) => new(a.Point0 + b.Point0, a.Point1 + b.Point1);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rect2i operator +(Rect2i a, Vector2i b) => new(a.Point0 + b.X, a.Point1 + b.Y);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rect2i FromSize(Vector2 position, Vector2 size) =>
+        new(position.X, position.Y + size.Y, position.X + size.X, position.Y);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rect2i operator +(Rect2i a, Vector2i b)
-    {
-        return new Rect2i(a.Point0 + b.X, a.Point1 + b.Y);
-    }
+    public static Rect2i FromSize(Vector2i position, Vector2i size) =>
+        new(position.X, position.Y + size.Y, position.X + size.X, position.Y);
 }
