@@ -834,6 +834,24 @@ public readonly struct Matrix4x4 : IMatrix, IMatrixSquare, IEquatable<Matrix4x4>
             position.X, position.Y, position.Z, 1
         );
     }
+    
+    public static Matrix4x4 CreateTransformSRT2D(Vector2 position, Angle angle, Vector2 scale)
+    {
+        var cos = (float) angle.Cos;
+        var sin = (float) angle.Sin;
+        
+        var m00 = scale.X * cos;
+        var m01 = scale.X * sin;
+        var m10 = -scale.Y * sin;
+        var m11 = scale.Y * cos;
+        
+        return new Matrix4x4(
+            m00, m01, 0f, 0f,
+            m10, m11, 0f, 0f,
+             0f,  0f, 1f, 0f,
+            position.X, position.Y, 0f, 1f
+        );
+    }
 
     /// <summary>
     /// Creates a transformation matrix using T * R * S order.
