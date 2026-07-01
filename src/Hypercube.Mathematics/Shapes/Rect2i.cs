@@ -10,7 +10,7 @@ namespace Hypercube.Mathematics.Shapes;
 [PublicAPI, Serializable, StructLayout(LayoutKind.Sequential)]
 [DebuggerDisplay("{ToString()}")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public readonly struct Rect2i
+public readonly struct Rect2i : IEquatable<Rect2i>
 {
     public static readonly Rect2i Zero = new(Vector2i.Zero, Vector2i.Zero);
     
@@ -83,12 +83,24 @@ public readonly struct Rect2i
         Point0 = new Vector2i(value);
         Point1 = new Vector2i(value);
     }
-    
+
+    public bool Equals(Rect2i other) => Point0.Equals(other.Point0) && Point1.Equals(other.Point1);
+
+    public override bool Equals(object? obj) => obj is Rect2i other && Equals(other);
+
+    public override int GetHashCode() => HashCode.Combine(Point0, Point1);
+
     public override string ToString()
     {
         return $"[{Point0}, {Point1}]";
     }
-    
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(Rect2i a, Rect2i b) => a.Equals(b);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Rect2i a, Rect2i b) => !(a == b);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rect2i operator +(Rect2i a, Rect2i b) => new(a.Point0 + b.Point0, a.Point1 + b.Point1);
 
@@ -98,7 +110,7 @@ public readonly struct Rect2i
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rect2i FromSize(Vector2 position, Vector2 size) =>
         new(position.X, position.Y + size.Y, position.X + size.X, position.Y);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rect2i FromSize(Vector2i position, Vector2i size) =>
         new(position.X, position.Y + size.Y, position.X + size.X, position.Y);
